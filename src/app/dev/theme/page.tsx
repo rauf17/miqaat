@@ -31,7 +31,7 @@ export default function ThemeQAPage() {
               className="relative overflow-hidden rounded-3xl border border-border bg-theme-gradient p-8 min-h-[300px] flex flex-col justify-between shadow-lg"
             >
               <GeometricPattern className="text-foreground" />
-              <NightAtmosphere className="text-foreground" />
+              {state.id === 'night' && <NightAtmosphere className="text-foreground" />}
               
               <div className="relative z-10 space-y-4">
                 <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">

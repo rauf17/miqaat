@@ -8,7 +8,7 @@ interface GeometricPatternProps extends React.SVGProps<SVGSVGElement> {
 export function GeometricPattern({ className, ...props }: GeometricPatternProps) {
   return (
     <svg
-      className={cn('absolute inset-0 h-full w-full pointer-events-none mix-blend-overlay opacity-5', className)}
+      className={cn('absolute inset-0 h-full w-full pointer-events-none mix-blend-overlay opacity-15', className)}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
