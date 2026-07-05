@@ -33,8 +33,8 @@ export default function Icon() {
           xmlns="http://www.w3.org/2000/svg"
         >
           <line x1="2" y1="18" x2="22" y2="18" />
-          <circle cx="12" cy="15" r="3" fill="#C9A227" stroke="none" />
-          <path d="M4 18 L4 12 C4 4, 9 2, 12 5 C15 2, 20 4, 20 12 L20 18" />
+          <circle cx="12" cy="16" r="4" fill="#C9A227" stroke="none" />
+          <path d="M4 12 C4 4, 9 2, 12 6 C15 2, 20 4, 20 12" strokeLinecap="round" />
         </svg>
       </div>
     ),

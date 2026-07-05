@@ -70,11 +70,11 @@ export function LogoMark({ animateIn = false, isHovered = false, reducedMotion =
         variants={lineVariants}
       />
       
-      {/* Sun / Moon */}
+      {/* Sun / Moon - Bisected by horizon */}
       <motion.circle 
         cx="12" 
-        cy="15" 
-        r="3" 
+        cy="16" 
+        r="4" 
         fill="var(--logo-sun)" 
         stroke="none" 
         variants={sunVariants}
@@ -93,10 +93,11 @@ export function LogoMark({ animateIn = false, isHovered = false, reducedMotion =
         <circle cx="15" cy="11" r="0.5" />
       </motion.g>
 
-      {/* Subtle "M" Arch */}
+      {/* Subtle floating "M" Arch - Open, un-enclosed */}
       <motion.path 
-        d="M4 18 L4 12 C4 4, 9 2, 12 5 C15 2, 20 4, 20 12 L20 18" 
+        d="M4 12 C4 4, 9 2, 12 6 C15 2, 20 4, 20 12" 
         stroke="var(--logo-base)"
+        strokeLinecap="round"
         variants={archVariants}
       />
     </motion.svg>
