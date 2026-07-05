@@ -52,17 +52,22 @@ export function PrayerTimeline() {
   // We need today's times to render the list.
   // We compute it once per render, which is fine since it's just local date math,
   // or we could memoize it.
-  const todayTimes = React.useMemo(() => {
+  // We use the date of the current prayer to generate the timeline.
+  // This ensures that if it's 1 AM and Isha is still active, we show yesterday's 
+  // timeline instead of today's (which would make all prayers appear as 'future').
+  const timelineDate = currentPrayerState?.current.time || new Date();
+  
+  const timelineTimes = React.useMemo(() => {
     if (lat === null || lng === null) return null;
     return calculatePrayerTimes({
       lat,
       lng,
-      date: new Date(),
+      date: timelineDate,
       method: calculationMethod,
     });
-  }, [lat, lng, calculationMethod]);
+  }, [lat, lng, calculationMethod, timelineDate]);
 
-  if (!todayTimes || !currentPrayerState) {
+  if (!timelineTimes || !currentPrayerState) {
     return (
       <div className="flex h-48 items-center justify-center text-muted-foreground animate-pulse">
         Calculating times...
@@ -77,18 +82,20 @@ export function PrayerTimeline() {
     <div className="relative flex flex-col space-y-0 py-6 w-full mx-auto" role="list" aria-label="Prayer Timeline">
 
       {PRAYER_SEQUENCE.map((prayerName, index) => {
-        const time = todayTimes[prayerName];
+        const time = timelineTimes[prayerName];
         const isCurrent = current.name === prayerName;
         const isNext = next.name === prayerName;
-        const isPast = time.getTime() < currentPrayerState.now.getTime() && !isCurrent;
-        const isFuture = !isPast && !isCurrent;
+        // Strict index comparison ensures logical past/future regardless of minor time drift
+        const currentIndex = PRAYER_SEQUENCE.indexOf(current.name);
+        const isPast = index < currentIndex;
+        const isFuture = index > currentIndex;
         
         return (
           <div 
             key={prayerName}
             className={cn(
               "timeline-node relative flex items-start gap-8 py-5 group transition-opacity duration-300 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary",
-              isPast && "opacity-50 grayscale-[50%]",
+              isPast && "opacity-40 grayscale",
               isFuture && "cursor-pointer hover:bg-muted/20"
             )}
             role={isFuture ? "button" : "listitem"}
@@ -107,8 +114,8 @@ export function PrayerTimeline() {
             {/* Segment connecting to next node */}
             {index < PRAYER_SEQUENCE.length - 1 && (
               <div className={cn(
-                "absolute left-[2.25rem] top-[2.5rem] bottom-[-1.25rem] w-[2px] -translate-x-1/2 -z-10",
-                (isPast || isCurrent) ? "bg-muted-foreground/40" : "bg-border/50"
+                "absolute left-[2.25rem] top-[2.5rem] bottom-[-1.25rem] -translate-x-1/2 -z-10",
+                (isPast || isCurrent) ? "w-[3px] bg-foreground/30" : "w-[1px] bg-border/50"
               )} />
             )}
             {/* Node marker container */}
@@ -129,8 +136,8 @@ export function PrayerTimeline() {
                 className={cn(
                   "relative z-10 h-5 w-5 rounded-full border-[3px] transition-colors duration-500",
                   isCurrent ? "border-primary bg-background shadow-[0_0_20px_var(--color-time-glow)] ring-4 ring-primary/20" : 
-                  isPast ? "border-muted-foreground bg-muted-foreground/20" : 
-                  "border-muted-foreground bg-background"
+                  isPast ? "border-foreground/30 bg-foreground/10" : 
+                  "border-muted-foreground/40 bg-background"
                 )}
               />
             </div>
@@ -150,7 +157,7 @@ export function PrayerTimeline() {
                 
                 <span className={cn(
                   "text-lg font-medium transition-colors",
-                  isCurrent ? "text-primary font-bold" : isPast ? "text-muted-foreground/50" : "text-muted-foreground"
+                  isCurrent ? "text-primary font-bold" : isPast ? "text-foreground/50" : "text-muted-foreground"
                 )}>
                   {formatTime(time, is24h)}
                 </span>
