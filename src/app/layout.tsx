@@ -52,6 +52,24 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${lora.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var hour = new Date().getHours();
+                  var theme = 'night';
+                  if (hour >= 4 && hour < 7) theme = 'dawn';
+                  else if (hour >= 7 && hour < 17) theme = 'day';
+                  else if (hour >= 17 && hour < 20) theme = 'golden';
+                  document.documentElement.setAttribute('data-time-of-day', theme);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         <noscript>
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm p-6 text-center">
