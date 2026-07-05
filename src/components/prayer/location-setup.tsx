@@ -6,8 +6,8 @@ import { useSettingsStore } from '@/lib/store/settingsStore';
 import { MapPin, Search, Loader2 } from 'lucide-react';
 
 export function LocationSetup() {
-  const { city, lat, setLocation } = useLocationStore();
-  const { manualLocationOverride, setManualLocationOverride } = useSettingsStore();
+  const { setLocation } = useLocationStore();
+  const { setManualLocationOverride } = useSettingsStore();
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   
@@ -73,10 +73,6 @@ export function LocationSetup() {
     setSearchQuery('');
   };
 
-  if (lat && city && !manualLocationOverride) {
-    return null; // Already setup and not manually overriding
-  }
-
   return (
     <div className="w-full max-w-md mx-auto p-6 rounded-2xl bg-card border border-border shadow-sm space-y-6">
       <div className="text-center space-y-2">
@@ -115,6 +111,7 @@ export function LocationSetup() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search city manually..."
+              aria-label="Search city manually"
               className="w-full bg-input/50 border border-border rounded-xl py-3 pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
