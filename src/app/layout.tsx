@@ -15,8 +15,30 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "Miqaat",
-  description: "Your premium Islamic daily companion",
+  metadataBase: new URL("https://miqaat-beta.vercel.app"),
+  title: "Miqaat - Islamic Daily Companion",
+  description: "Your premium Islamic daily companion. Software that moves with the sky.",
+  keywords: ["Islamic", "Prayer Times", "Hijri", "Adhan", "Qibla"],
+  openGraph: {
+    title: "Miqaat - Islamic Daily Companion",
+    description: "Your premium Islamic daily companion. Software that moves with the sky.",
+    url: "https://miqaat-beta.vercel.app",
+    siteName: "Miqaat",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Miqaat - Islamic Daily Companion",
+    description: "Your premium Islamic daily companion. Software that moves with the sky.",
+  },
+};
+
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#050B14" }
+  ],
 };
 
 export default function RootLayout({
@@ -31,6 +53,16 @@ export default function RootLayout({
       className={`${inter.variable} ${lora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
+        <noscript>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm p-6 text-center">
+            <div className="max-w-md space-y-4 rounded-2xl border border-border bg-card p-6 shadow-lg">
+              <h2 className="font-heading text-2xl font-bold text-foreground">JavaScript Required</h2>
+              <p className="text-muted-foreground text-sm">
+                Miqaat relies on real-time browser calculations and location services to accurately determine prayer times. Please enable JavaScript in your browser settings to use this app.
+              </p>
+            </div>
+          </div>
+        </noscript>
         <NightAtmosphere className="fixed text-foreground opacity-30 z-0 mix-blend-overlay pointer-events-none" />
         <div className="relative z-10 flex-1 flex flex-col">
           <ThemeProvider>{children}</ThemeProvider>

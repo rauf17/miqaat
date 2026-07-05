@@ -125,7 +125,10 @@ export function LocationSetup() {
         </form>
 
         {error && (
-          <p className="text-sm text-destructive text-center font-medium mt-4">{error}</p>
+          <div className="p-3 mt-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium flex items-start gap-2">
+            <span className="shrink-0">⚠️</span>
+            <p>{error}</p>
+          </div>
         )}
       </div>
     </div>
