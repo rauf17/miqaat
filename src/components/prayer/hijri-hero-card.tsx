@@ -29,8 +29,11 @@ export function HijriHeroCard() {
   const weekday = format(date, 'EEEE');
 
   return (
-    <div className="flex flex-col items-center justify-center py-10 px-4 text-center space-y-4 w-full">
-      <div className="flex flex-col space-y-1">
+    <div className="flex flex-col items-center justify-center py-12 px-6 text-center space-y-4 w-full bg-card border border-border shadow-lg rounded-3xl overflow-hidden relative">
+      {/* Subtle background glow for the hero card */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+      
+      <div className="flex flex-col space-y-1 relative z-10">
         <span className="text-sm font-medium tracking-widest uppercase text-muted-foreground">
           {weekday}
         </span>
@@ -40,15 +43,15 @@ export function HijriHeroCard() {
       </div>
 
       <motion.div 
-        className="flex flex-col items-center"
+        className="flex flex-col items-center relative z-10"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
       >
-        <h2 className="text-4xl md:text-5xl font-heading font-bold text-primary tracking-tight">
+        <h2 className="text-5xl md:text-6xl font-heading font-bold text-primary tracking-tight">
           {hijri.day} {hijri.monthName}
         </h2>
-        <span className="text-xl font-heading font-medium text-primary/80 mt-2">
+        <span className="text-2xl font-heading font-medium text-primary/80 mt-3">
           {hijri.year} AH
         </span>
       </motion.div>

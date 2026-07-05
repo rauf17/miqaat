@@ -56,9 +56,9 @@ export function PrayerTimeline() {
   const is24h = timeFormat === '24h';
 
   return (
-    <div className="relative flex flex-col space-y-0 py-4 w-full max-w-sm mx-auto">
+    <div className="relative flex flex-col space-y-0 py-6 w-full mx-auto">
       {/* Central rail line */}
-      <div className="absolute left-6 top-8 bottom-8 w-px bg-border -z-10" />
+      <div className="absolute left-[2.25rem] top-10 bottom-10 w-0.5 bg-border -z-10" />
 
       {PRAYER_SEQUENCE.map((prayerName) => {
         const time = todayTimes[prayerName];
@@ -69,18 +69,18 @@ export function PrayerTimeline() {
         return (
           <div 
             key={prayerName}
-            className="relative flex items-start gap-6 py-4 cursor-pointer group"
+            className="relative flex items-start gap-8 py-5 cursor-pointer group"
             onClick={() => setExpandedNode(expandedNode === prayerName ? null : prayerName)}
           >
-            {/* Node marker */}
-            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
+            {/* Node marker container */}
+            <div className="relative flex h-8 w-16 shrink-0 items-center justify-center">
               {/* Outer Glow (Animated for Current) */}
               {isCurrent && (
                 <motion.div
                   layoutId="current-glow"
-                  className="absolute inset-0 rounded-full bg-primary/20 blur-md hidden sm:block motion-safe:block"
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute inset-0 rounded-full bg-primary/30 blur-xl hidden sm:block motion-safe:block"
+                  animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 />
               )}
               
@@ -88,30 +88,30 @@ export function PrayerTimeline() {
               <motion.div 
                 layout
                 className={cn(
-                  "relative z-10 h-4 w-4 rounded-full border-2 transition-colors duration-500",
-                  isCurrent ? "border-primary bg-primary shadow-[0_0_15px_var(--color-time-glow)]" : 
-                  isPast ? "border-muted-foreground/30 bg-muted/50" : 
-                  "border-muted-foreground/50 bg-card"
+                  "relative z-10 h-5 w-5 rounded-full border-[3px] transition-colors duration-500",
+                  isCurrent ? "border-primary bg-background shadow-[0_0_20px_var(--color-time-glow)] ring-4 ring-primary/20" : 
+                  isPast ? "border-border bg-background/50" : 
+                  "border-muted-foreground bg-background"
                 )}
               />
             </div>
 
             {/* Content */}
-            <div className="flex flex-col pt-3 w-full">
+            <div className="flex flex-col pt-0.5 w-full">
               <div className="flex items-baseline justify-between">
                 <motion.h3 
                   layout
                   className={cn(
-                    "text-xl font-heading font-medium transition-colors",
-                    isCurrent ? "text-primary" : isPast ? "text-muted-foreground/50" : "text-foreground"
+                    "text-2xl font-heading font-medium transition-colors",
+                    isCurrent ? "text-primary font-bold" : isPast ? "text-muted-foreground/50" : "text-foreground"
                   )}
                 >
                   {PRAYER_DISPLAY_NAMES[prayerName]}
                 </motion.h3>
                 
                 <span className={cn(
-                  "text-sm font-medium transition-colors",
-                  isCurrent ? "text-primary" : isPast ? "text-muted-foreground/50" : "text-muted-foreground"
+                  "text-lg font-medium transition-colors",
+                  isCurrent ? "text-primary font-bold" : isPast ? "text-muted-foreground/50" : "text-muted-foreground"
                 )}>
                   {formatTime(time, is24h)}
                 </span>
@@ -127,12 +127,14 @@ export function PrayerTimeline() {
                     transition={themeTransitionPreset}
                     className="overflow-hidden"
                   >
-                    <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground bg-muted/50 rounded-lg p-3 border border-border/50">
-                      <Clock className="w-4 h-4 text-primary shrink-0" />
+                    <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground bg-muted/40 rounded-xl p-4 border border-border/50">
+                      <Clock className="w-5 h-5 text-primary shrink-0" />
                       {isNext ? (
                         <div className="flex flex-col">
-                          <span className="font-medium text-foreground">Next Prayer</span>
-                          <LiveCountdown targetTime={next.time} />
+                          <span className="font-medium text-foreground text-xs uppercase tracking-wider mb-1">Next Prayer</span>
+                          <div className="text-lg font-mono tracking-tight text-primary">
+                            <LiveCountdown targetTime={next.time} />
+                          </div>
                         </div>
                       ) : (
                         <span>Exact time: {format(time, is24h ? 'HH:mm:ss' : 'hh:mm:ss a')}</span>

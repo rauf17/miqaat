@@ -94,22 +94,13 @@ export function SettingsSheet() {
                     className={cn(
                       "flex flex-col p-4 rounded-xl border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                       isSelected 
-                        ? "border-primary bg-primary/5 shadow-sm" 
+                        ? "border-primary bg-primary/10 shadow-sm" 
                         : "border-border hover:border-primary/50 hover:bg-muted/30"
                     )}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={cn("font-medium", isSelected ? "text-primary" : "text-foreground")}>
-                        {method.name}
-                      </span>
-                      {/* Custom Radio Circle */}
-                      <div className={cn(
-                        "w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors",
-                        isSelected ? "border-primary" : "border-muted-foreground/50"
-                      )}>
-                        {isSelected && <div className="w-2 h-2 rounded-full bg-primary" />}
-                      </div>
-                    </div>
+                    <span className={cn("font-medium mb-1", isSelected ? "text-primary" : "text-foreground")}>
+                      {method.name}
+                    </span>
                     <span className="text-sm text-muted-foreground">
                       {method.regionDescription}
                     </span>
