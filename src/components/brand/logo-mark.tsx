@@ -95,7 +95,7 @@ export function LogoMark({ animateIn = false, isHovered = false, reducedMotion =
 
       {/* Subtle floating "M" Arch - Open, un-enclosed */}
       <motion.path 
-        d="M4 12 C4 4, 9 2, 12 6 C15 2, 20 4, 20 12" 
+        d="M2 11 C 6 4, 10 8, 12 8 C 14 8, 18 4, 22 11" 
         stroke="var(--logo-base)"
         strokeLinecap="round"
         variants={archVariants}
