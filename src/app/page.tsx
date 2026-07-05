@@ -6,6 +6,7 @@ import { PrayerTimeline } from '@/components/prayer/prayer-timeline';
 import { HijriHeroCard } from '@/components/prayer/hijri-hero-card';
 import { SettingsSheet } from '@/components/prayer/settings-sheet';
 import { SplashScreen } from '@/components/ui/splash-screen';
+import { AnimatedLogo } from '@/components/brand/animated-logo';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { cn } from '@/lib/utils';
 
@@ -32,15 +33,7 @@ export default function Home() {
         
         {/* Header Section */}
         <header className="flex items-center justify-between w-full pb-4">
-          <div className="flex items-center gap-3">
-            {/* Minimal App Branding / Logo Mark */}
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 0 L60 30 L90 20 L75 45 L100 65 L70 70 L65 100 L45 75 L15 95 L25 65 L0 45 L30 35 L15 5 Z" fill="currentColor" className="text-primary opacity-80" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-heading font-bold text-foreground tracking-tight">Miqaat</h1>
-          </div>
+          <AnimatedLogo />
           <div className="z-50">
             <SettingsSheet />
           </div>

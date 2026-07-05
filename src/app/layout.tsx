@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Lora } from "next/font/google";
+import { Inter, Lora, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NightAtmosphere } from "@/components/ui/night-atmosphere";
 import "./globals.css";
@@ -11,6 +11,11 @@ const inter = Inter({
 
 const lora = Lora({
   variable: "--font-heading",
+  subsets: ["latin"],
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-brand",
   subsets: ["latin"],
 });
 
@@ -50,7 +55,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${lora.variable} h-full antialiased`}
+      className={`${inter.variable} ${lora.variable} ${plusJakartaSans.variable} h-full antialiased`}
     >
       <head>
         <script

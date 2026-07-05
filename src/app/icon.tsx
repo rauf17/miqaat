@@ -26,18 +26,15 @@ export default function Icon() {
         <svg
           width="256"
           height="256"
-          viewBox="0 0 100 100"
+          viewBox="0 0 24 24"
           fill="none"
+          stroke="#FAFAF8"
+          strokeWidth="1.5"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* An 8-point star / Khatam shape */}
-          <path
-            d="M50 0 L60 30 L90 20 L75 45 L100 65 L70 70 L65 100 L45 75 L15 95 L25 65 L0 45 L30 35 L15 5 Z"
-            fill="#D4AF37"
-            stroke="#FDE047"
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
+          <line x1="2" y1="18" x2="22" y2="18" />
+          <circle cx="12" cy="15" r="3" fill="#C9A227" stroke="none" />
+          <path d="M4 18 L4 12 C4 4, 9 2, 12 5 C15 2, 20 4, 20 12 L20 18" />
         </svg>
       </div>
     ),
