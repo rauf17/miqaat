@@ -52,8 +52,10 @@ export function PrayerTimeline() {
   // We need today's times to render the list.
   // We compute it once per render, which is fine since it's just local date math,
   // or we could memoize it.
-  // We need today's times to render the list.
-  const timelineDate = new Date();
+  // We use the date of the current prayer to generate the timeline.
+  // This ensures that if it's 1 AM and Isha is still active, we show yesterday's 
+  // timeline instead of today's (which would make all prayers appear as 'future').
+  const timelineDate = currentPrayerState?.current.time || new Date();
   
   const timelineTimes = React.useMemo(() => {
     if (lat === null || lng === null) return null;
@@ -82,19 +84,20 @@ export function PrayerTimeline() {
       {PRAYER_SEQUENCE.map((prayerName, index) => {
         const time = timelineTimes[prayerName];
         const isCurrent = current.name === prayerName;
-        // Strict time comparison so at 1 AM, today's Fajr (5 AM) is correctly evaluated as Future
-        const isPast = time.getTime() < currentPrayerState.now.getTime() && !isCurrent;
-        const isFuture = !isPast && !isCurrent;
+        // Strict index comparison ensures logical past/future regardless of minor time drift
+        const currentIndex = PRAYER_SEQUENCE.indexOf(current.name);
+        const isPast = index < currentIndex;
+        const isFuture = index > currentIndex;
         
         // The rail from the first prayer down to the current prayer is completed
-        const isRailCompleted = index < PRAYER_SEQUENCE.indexOf(current.name);
+        const isRailCompleted = index < currentIndex;
         
         return (
           <div 
             key={prayerName}
             className={cn(
               "timeline-node relative flex items-start gap-8 py-5 group transition-opacity duration-300 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary",
-              isPast && "opacity-75",
+              isPast && "opacity-70",
               isFuture && "cursor-pointer hover:bg-muted/20"
             )}
             role={isFuture ? "button" : "listitem"}
@@ -114,7 +117,7 @@ export function PrayerTimeline() {
             {index < PRAYER_SEQUENCE.length - 1 && (
               <div className={cn(
                 "absolute left-[2.25rem] top-[2.5rem] bottom-[-1.25rem] -translate-x-1/2 -z-10 rounded-full",
-                isRailCompleted ? "w-[4px] bg-foreground/25" : "w-[1px] bg-border/60"
+                isRailCompleted ? "w-[3px] bg-foreground/30" : "w-[1px] bg-border/50"
               )} />
             )}
             {/* Node marker container */}
@@ -135,8 +138,8 @@ export function PrayerTimeline() {
                 className={cn(
                   "relative z-10 h-5 w-5 rounded-full border-[3px] transition-colors duration-500",
                   isCurrent ? "border-primary bg-background shadow-[0_0_20px_var(--color-time-glow)] ring-4 ring-primary/20" : 
-                  isPast ? "border-foreground/30 bg-foreground/5" : 
-                  "border-muted-foreground/30 bg-background"
+                  isPast ? "border-foreground/30 bg-foreground/10" : 
+                  "border-muted-foreground/40 bg-background"
                 )}
               />
             </div>
