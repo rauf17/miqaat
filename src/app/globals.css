@@ -9,7 +9,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-heading); /* Fix: this was referencing var(--font-sans) before! */
+  
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -46,17 +47,32 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  
   --color-time-bg: var(--time-bg);
+  --color-time-bg-end: var(--time-bg-end);
   --color-time-card: var(--time-card);
   --color-time-text: var(--time-text);
   --color-time-accent: var(--time-accent);
   --color-time-glow: var(--time-glow);
 }
 
+/* Enable gradient transition across states in modern browsers */
+@property --time-bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --time-bg-end {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
 :root {
   /* Default fallbacks / Day state */
-  --time-bg: oklch(0.97 0.01 220); /* Soft cool daylight */
-  --time-card: oklch(1 0 0);
+  --time-bg: oklch(0.97 0.01 220); /* Bright neutral */
+  --time-bg-end: oklch(0.95 0.02 240); /* Faint blue-white */
+  --time-card: oklch(0.99 0.01 60); /* Warm off-white */
   --time-text: oklch(0.2 0.02 220);
   --time-accent: oklch(0.5 0.15 220);
   --time-glow: oklch(0.5 0.15 220 / 20%);
@@ -71,7 +87,7 @@
   --popover: var(--time-card);
   --popover-foreground: var(--time-text);
   --primary: var(--time-accent);
-  --primary-foreground: oklch(1 0 0);
+  --primary-foreground: oklch(0.98 0.01 60); /* Warm off-white */
   --secondary: oklch(from var(--time-card) calc(l - 0.05) c h);
   --secondary-foreground: var(--time-text);
   --muted: oklch(from var(--time-card) calc(l - 0.05) c h);
@@ -85,7 +101,8 @@
 }
 
 [data-time-of-day="dawn"] {
-  --time-bg: oklch(0.9 0.03 260); /* Soft cool blue/purple */
+  --time-bg: oklch(0.9 0.03 260); /* Cool lavender */
+  --time-bg-end: oklch(0.9 0.04 350); /* Soft peach/pink */
   --time-card: oklch(0.95 0.02 260);
   --time-text: oklch(0.25 0.05 260);
   --time-accent: oklch(0.6 0.12 280);
@@ -93,8 +110,9 @@
 }
 
 [data-time-of-day="day"] {
-  --time-bg: oklch(0.97 0.01 220); /* Bright warmish daylight */
-  --time-card: oklch(1 0 0);
+  --time-bg: oklch(0.97 0.01 220); /* Bright neutral */
+  --time-bg-end: oklch(0.95 0.02 240); /* Faint blue-white */
+  --time-card: oklch(0.99 0.01 60); /* Warm off-white instead of pure white */
   --time-text: oklch(0.2 0.02 220);
   --time-accent: oklch(0.5 0.15 220);
   --time-glow: oklch(0.5 0.15 220 / 20%);
@@ -102,18 +120,24 @@
 
 [data-time-of-day="golden"] {
   --time-bg: oklch(0.85 0.06 60); /* Golden amber */
+  --time-bg-end: oklch(0.8 0.08 40); /* Warm coral */
   --time-card: oklch(0.9 0.04 60);
   --time-text: oklch(0.2 0.05 60);
-  --time-accent: oklch(0.6 0.16 40);
-  --time-glow: oklch(0.6 0.16 40 / 30%);
+  --time-accent: oklch(0.65 0.12 60); /* Muted amber/terracotta */
+  --time-glow: oklch(0.65 0.12 60 / 30%);
 }
 
 [data-time-of-day="night"] {
-  --time-bg: oklch(0.2 0.04 260); /* Deep dark blue */
+  --time-bg: oklch(0.2 0.04 260); /* Deep navy */
+  --time-bg-end: oklch(0.12 0.02 260); /* Near-black */
   --time-card: oklch(0.25 0.03 260);
   --time-text: oklch(0.95 0.02 260);
   --time-accent: oklch(0.7 0.1 280);
   --time-glow: oklch(0.7 0.1 280 / 20%);
+}
+
+@utility bg-theme-gradient {
+  background-image: linear-gradient(to bottom right, var(--time-bg), var(--time-bg-end));
 }
 
 @layer base {
@@ -121,14 +145,16 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground bg-theme-gradient;
+    background-color: var(--background); /* Fallback */
+    background-attachment: fixed; /* Ensures gradient fills screen */
   }
   html {
     @apply font-sans;
   }
   
   html, body, .card, [data-theme-transition] {
-    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow, --time-bg, --time-bg-end;
     transition-duration: 60s;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }

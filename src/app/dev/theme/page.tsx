@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { GeometricPattern } from '@/components/ui/geometric-pattern';
+import { NightAtmosphere } from '@/components/ui/night-atmosphere';
 import { TimeOfDay } from '@/lib/theme/useTimeOfDay';
 
 // NOTE: This route is for development QA only and must be removed before production.
@@ -27,9 +28,10 @@ export default function ThemeQAPage() {
             <div
               key={state.id}
               data-time-of-day={state.id}
-              className="relative overflow-hidden rounded-3xl border border-border bg-background p-8 min-h-[300px] flex flex-col justify-between shadow-lg"
+              className="relative overflow-hidden rounded-3xl border border-border bg-theme-gradient p-8 min-h-[300px] flex flex-col justify-between shadow-lg"
             >
               <GeometricPattern className="text-foreground" />
+              <NightAtmosphere className="text-foreground" />
               
               <div className="relative z-10 space-y-4">
                 <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
