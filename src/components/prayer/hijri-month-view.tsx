@@ -26,6 +26,16 @@ export function HijriMonthView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedEvent(null);
+    };
+    if (selectedEvent) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedEvent]);
+
   if (!currentDate || !viewState) {
     return <div className="h-96 w-full animate-pulse bg-card border border-border rounded-3xl" />;
   }
@@ -137,7 +147,7 @@ export function HijriMonthView() {
                         role={hasEvent ? "button" : undefined}
                         tabIndex={hasEvent ? 0 : undefined}
                         className={cn(
-                          "relative aspect-square flex flex-col items-center justify-center p-1 rounded-xl transition-all",
+                          "group relative aspect-square flex flex-col items-center justify-center p-1 rounded-xl transition-all",
                           day.isPadding ? "opacity-30" : "hover:bg-muted/50",
                           hasEvent && "cursor-pointer active:scale-95",
                           isToday && "ring-2 ring-primary bg-primary/10 shadow-[0_0_15px_var(--color-time-glow)]",
@@ -162,8 +172,8 @@ export function HijriMonthView() {
                         {/* Events */}
                         {hasEvent && (
                           <div className="absolute bottom-1 md:bottom-1.5 flex flex-col items-center w-full px-1">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary mb-0.5 md:hidden" />
-                            <span className="hidden md:block text-[9px] leading-tight text-primary font-medium text-center truncate w-full">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary mb-0.5" />
+                            <span className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity absolute top-full mt-1 bg-popover text-popover-foreground text-[10px] px-2 py-1 rounded shadow-lg pointer-events-none whitespace-nowrap z-50">
                               {events[0].name}
                             </span>
                           </div>
