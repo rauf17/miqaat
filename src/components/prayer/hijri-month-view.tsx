@@ -172,9 +172,12 @@ export function HijriMonthView() {
                         {/* Events */}
                         {hasEvent && (
                           <div className="absolute bottom-1 md:bottom-1.5 flex flex-col items-center w-full px-1">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary mb-0.5" />
-                            <span className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity absolute top-full mt-1 bg-popover text-popover-foreground text-[10px] px-2 py-1 rounded shadow-lg pointer-events-none whitespace-nowrap z-50">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary mb-0.5 md:hidden" />
+                            <span className="hidden md:block text-[9px] leading-tight text-primary font-medium text-center truncate w-full">
                               {events[0].name}
+                            </span>
+                            <span className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-full mt-1 bg-popover text-popover-foreground text-[10px] px-2 py-1 rounded shadow-lg pointer-events-none max-w-[120px] md:max-w-[150px] truncate z-50">
+                              {events[0].description}
                             </span>
                           </div>
                         )}
