@@ -48,6 +48,7 @@ export function QiblaCompass() {
       setPermissionState('prompt');
     } else {
       setPermissionState('granted');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ('ondeviceorientationabsolute' in (window as any)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (window as any).addEventListener('deviceorientationabsolute', handleOrientation as any, true);
@@ -120,7 +121,7 @@ export function QiblaCompass() {
         </div>
       )}
 
-      {(permissionState === 'denied' || permissionState === 'unsupported' || (permissionState === 'granted' && heading === null)) && permissionState !== 'prompt' && (
+      {(permissionState === 'denied' || permissionState === 'unsupported' || (permissionState === 'granted' && heading === null)) && (
         <div className="w-full flex items-start gap-3 p-4 rounded-2xl border border-border/50 bg-muted/30 backdrop-blur-md text-sm text-muted-foreground">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 opacity-70" />
           <p>
