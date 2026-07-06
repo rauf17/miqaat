@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useLocationStore } from '@/lib/store/locationStore';
+import { useTimeOfDay } from '@/lib/theme/useTimeOfDay';
 import { 
   Sun, 
   Cloud, 
@@ -22,6 +23,7 @@ type WeatherData = {
 
 export function WeatherWidget() {
   const { lat, lng } = useLocationStore();
+  const updateTimeOfDay = useTimeOfDay((s) => s.updateTimeOfDay);
   const [data, setData] = React.useState<WeatherData | null>(null);
   const [error, setError] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -40,6 +42,9 @@ export function WeatherWidget() {
         if (mounted && json.tempC !== undefined) {
           setData(json);
           setError(false);
+          if (json.sunrise && json.sunset) {
+            updateTimeOfDay(new Date(json.sunrise), new Date(json.sunset));
+          }
         } else {
           throw new Error('Invalid weather data');
         }

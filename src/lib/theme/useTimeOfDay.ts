@@ -15,12 +15,13 @@ export const computeTimeOfDay = (
   sunset?: Date,
   fajr?: Date
 ): TimeOfDay => {
-  // If we have real prayer times, use them
-  if (sunrise && sunset && fajr) {
+  // If we have real sunrise/sunset, use them
+  if (sunrise && sunset) {
     const time = date.getTime();
     
-    // Dawn is from Fajr until Sunrise
-    if (time >= fajr.getTime() && time < sunrise.getTime()) return 'dawn';
+    // Dawn is from Fajr until Sunrise (fallback to 90 mins before sunrise if fajr missing)
+    const effectiveFajr = fajr || new Date(sunrise.getTime() - 90 * 60 * 1000);
+    if (time >= effectiveFajr.getTime() && time < sunrise.getTime()) return 'dawn';
     
     // Day is from Sunrise until 1 hour before Sunset
     const goldenHourStart = new Date(sunset.getTime() - 60 * 60 * 1000);
