@@ -49,8 +49,10 @@ export function PrayerTimeline() {
     };
   }, []);
 
-  // We need today's times to render the list.
-  const timelineDate = currentPrayerState?.current.time || new Date();
+  // Memoize the fallback date so `new Date()` doesn't create a new reference
+  // on every render (which would invalidate useMemo and cause an infinite loop).
+  const stableFallbackDate = React.useMemo(() => new Date(), []);
+  const timelineDate = currentPrayerState?.current.time ?? stableFallbackDate;
   
   const timelineTimes = React.useMemo(() => {
     if (lat === null || lng === null) return null;
