@@ -9,7 +9,7 @@ import { SplashScreen } from '@/components/ui/splash-screen';
 import { AnimatedLogo } from '@/components/brand/animated-logo';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { cn } from '@/lib/utils';
-import { CalendarDays, Clock, Settings } from 'lucide-react';
+import { CalendarDays, Clock, Settings, Compass } from 'lucide-react';
 import Link from 'next/link';
 import { NotificationScheduler } from '@/components/prayer/notification-scheduler';
 
@@ -39,7 +39,14 @@ export default function Home() {
         {/* Header Section */}
         <header className="flex items-center justify-between w-full pb-4">
           <AnimatedLogo />
-          <div className="z-50">
+          <div className="z-50 flex items-center gap-2">
+            <Link 
+              href="/qibla"
+              className="inline-flex p-2 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Open Qibla compass"
+            >
+              <Compass className="w-5 h-5 text-foreground" />
+            </Link>
             <Link 
               href="/settings"
               className="inline-flex p-2 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
