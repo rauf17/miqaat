@@ -31,7 +31,7 @@ describe('Reflection Cache', () => {
   it('should generate a deterministic cache key', () => {
     const key1 = generateCacheKey('2023-10-20', '33.64,72.97');
     const key2 = generateCacheKey('2023-10-20', '33.64,72.97');
-    expect(key1).toBe('miqaat-reflection-2023-10-20-33.64,72.97');
+    expect(key1).toBe('miqaat-reflection-v2-2023-10-20-33.64,72.97');
     expect(key1).toBe(key2);
   });
 

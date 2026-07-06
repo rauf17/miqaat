@@ -3,6 +3,12 @@ import { NextResponse } from 'next/server';
 function isValidReflection(output: string): boolean {
   if (!output || typeof output !== 'string' || output.trim().length < 10) return false;
   
+  const words = output.trim().split(/\s+/);
+  if (words.length < 15) return false; // Too short to be a 2-4 sentence reflection
+
+  const sentences = output.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  if (sentences.length < 2) return false; // Needs at least 2 sentences
+
   const forbiddenWords = ['surah', 'ayah', 'bukhari', 'muslim', 'tirmidhi', 'narrated', 'prophet said', 'allah says'];
   const lowerOutput = output.toLowerCase();
   
@@ -18,6 +24,11 @@ function isValidReflection(output: string): boolean {
 }
 
 async function generateWithGemini(prompt: string, apiKey: string): Promise<string> {
+  // TEST FLAG: Force Gemini to fail so we can verify the Groq fallback works
+  if (process.env.FORCE_GEMINI_FAILURE === 'true') {
+    throw new Error('TESTING: Forced Gemini failure via FORCE_GEMINI_FAILURE=true');
+  }
+
   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

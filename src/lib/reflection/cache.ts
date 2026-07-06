@@ -6,7 +6,7 @@ export interface CachedReflection {
 }
 
 export function generateCacheKey(dateStr: string, locationHash: string): string {
-  return `miqaat-reflection-${dateStr}-${locationHash}`;
+  return `miqaat-reflection-v2-${dateStr}-${locationHash}`;
 }
 
 export function getCachedReflection(key: string): CachedReflection | null {
