@@ -107,18 +107,15 @@ export function PrayerTimeline() {
             )}
             {/* Node marker container */}
             <div className="relative flex h-8 w-16 shrink-0 items-center justify-center">
-              {/* Outer Glow (Animated for Current) */}
+              {/* Outer Glow (Animated for Current using CSS animation instead of Framer Motion) */}
               {!isLoading && isCurrent && (
-                <motion.div
-                  layoutId="current-glow"
-                  className="absolute inset-0 rounded-full bg-primary/30 blur-xl hidden sm:block motion-safe:block"
-                  animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                <div
+                  className="absolute inset-0 rounded-full bg-primary/30 blur-xl hidden sm:block motion-safe:animate-current-glow"
                 />
               )}
               
-              {/* Node Circle (always motion.div to prevent unmounting/remounting) */}
-              <motion.div 
+              {/* Node Circle (plain HTML div to avoid Framer Motion tracking) */}
+              <div 
                 className={cn(
                   "relative z-10 h-5 w-5 rounded-full border-[3px]",
                   isLoading ? "border-muted-foreground/20 bg-muted/10" : 
@@ -135,8 +132,8 @@ export function PrayerTimeline() {
             {/* Content */}
             <div className="flex flex-col pt-0.5 w-full">
               <div className="flex items-baseline justify-between">
-                {/* always motion.h3 to prevent unmounting/remounting */}
-                <motion.h3 
+                {/* plain HTML h3 to avoid Framer Motion tracking */}
+                <h3 
                   className={cn(
                     "text-xl font-heading font-medium",
                     isLoading ? "text-muted-foreground/40" : 
@@ -147,7 +144,7 @@ export function PrayerTimeline() {
                   )}
                 >
                   {PRAYER_DISPLAY_NAMES[prayerName]}
-                </motion.h3>
+                </h3>
                 
                 <span className={cn(
                   "text-lg font-medium",
