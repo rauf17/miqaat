@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { CalendarDays, Clock, Settings, Compass } from 'lucide-react';
 import Link from 'next/link';
 import { NotificationScheduler } from '@/components/prayer/notification-scheduler';
+import { WeatherWidget } from '@/components/weather/weather-widget';
 
 export default function Home() {
   const [isMounted, setIsMounted] = React.useState(false);
@@ -40,6 +41,7 @@ export default function Home() {
         <header className="flex items-center justify-between w-full pb-4">
           <AnimatedLogo />
           <div className="z-50 flex items-center gap-2">
+            <WeatherWidget />
             <Link 
               href="/qibla"
               className="inline-flex p-2 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
