@@ -79,7 +79,7 @@ export function PrayerTimeline() {
   const is24h = timeFormat === '24h';
 
   return (
-    <div className="relative flex flex-col space-y-0 py-2 w-full mx-auto" role="list" aria-label="Prayer Timeline">
+    <div className="relative flex flex-col space-y-0 py-1 w-full mx-auto" role="list" aria-label="Prayer Timeline">
 
       {PRAYER_SEQUENCE.map((prayerName, index) => {
         const time = timelineTimes[prayerName];
@@ -96,7 +96,7 @@ export function PrayerTimeline() {
           <div 
             key={prayerName}
             className={cn(
-              "timeline-node relative flex items-start gap-8 py-3 group transition-opacity duration-300 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary",
+              "timeline-node relative flex items-start gap-8 py-2 group transition-opacity duration-300 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary",
               isPast && "opacity-50",
               isFuture && "cursor-pointer hover:bg-muted/20"
             )}
@@ -150,7 +150,7 @@ export function PrayerTimeline() {
                 <motion.h3 
                   layout
                   className={cn(
-                    "text-2xl font-heading font-medium transition-colors",
+                    "text-xl font-heading font-medium transition-colors",
                     isCurrent ? "text-primary font-bold" : isPast ? "text-muted-foreground/50" : "text-foreground"
                   )}
                 >
@@ -175,7 +175,7 @@ export function PrayerTimeline() {
                     transition={themeTransitionPreset}
                     className="overflow-hidden"
                   >
-                    <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground bg-muted/40 rounded-xl p-3 border border-border/50">
+                    <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground bg-muted/40 rounded-xl p-2.5 border border-border/50">
                       <Clock className="w-5 h-5 text-primary shrink-0" />
                       {next.name === prayerName ? (
                         <div className="flex flex-col">

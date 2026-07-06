@@ -32,10 +32,10 @@ export default function Home() {
       <SplashScreen show={!isMounted} />
       <NotificationScheduler />
       <main className={cn(
-        "flex min-h-screen flex-col items-center justify-start p-4 pt-4 md:p-12 relative z-10 transition-opacity duration-1000",
+        "flex min-h-screen flex-col items-center justify-start p-4 pt-4 md:p-6 relative z-10 transition-opacity duration-1000",
         !isMounted ? "opacity-0" : "opacity-100"
       )}>
-        <div className="w-full max-w-2xl mx-auto space-y-6">
+        <div className="w-full max-w-2xl mx-auto space-y-4">
         
         {/* Header Section */}
         <header className="flex items-center justify-between w-full pb-4">
