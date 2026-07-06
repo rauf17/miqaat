@@ -11,6 +11,7 @@ import { AnimatedLogo } from '@/components/brand/animated-logo';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { cn } from '@/lib/utils';
 import { CalendarDays, Clock } from 'lucide-react';
+import { NotificationScheduler } from '@/components/prayer/notification-scheduler';
 
 export default function Home() {
   const [isMounted, setIsMounted] = React.useState(false);
@@ -28,6 +29,7 @@ export default function Home() {
   return (
     <>
       <SplashScreen show={!isMounted} />
+      <NotificationScheduler />
       <main className={cn(
         "flex min-h-screen flex-col items-center justify-start p-4 pt-6 md:p-12 relative z-10 transition-opacity duration-1000",
         !isMounted ? "opacity-0" : "opacity-100"

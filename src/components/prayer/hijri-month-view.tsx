@@ -20,8 +20,10 @@ export function HijriMonthView() {
 
   React.useEffect(() => {
     const now = new Date();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentDate(now);
     const hijri = toHijri(now);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setViewState({ year: hijri.year, month: hijri.monthName });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

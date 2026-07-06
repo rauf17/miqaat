@@ -13,6 +13,7 @@ import { Settings } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settingsStore';
 import { CALCULATION_METHODS, CalculationMethodId } from '@/lib/prayer/methods';
 import { LocationSetup } from './location-setup';
+import { NotificationSetup } from './notification-setup';
 import { cn } from '@/lib/utils';
 
 export function SettingsSheet() {
@@ -68,6 +69,12 @@ export function SettingsSheet() {
                 </button>
               ))}
             </div>
+          </section>
+
+          {/* Notifications */}
+          <section className="space-y-4">
+            <h3 className="font-heading font-medium text-lg">Reminders</h3>
+            <NotificationSetup />
           </section>
 
           {/* Calculation Method */}
