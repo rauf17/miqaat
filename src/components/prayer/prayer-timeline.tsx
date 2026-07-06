@@ -105,7 +105,6 @@ export function PrayerTimeline() {
                 isRailCompleted ? "w-[3px] bg-primary/50 transition-all duration-500" : "w-[1px] bg-border/50 transition-all duration-500"
               )} />
             )}
-            
             {/* Node marker container */}
             <div className="relative flex h-8 w-16 shrink-0 items-center justify-center">
               {/* Outer Glow (Animated for Current) */}
@@ -118,55 +117,48 @@ export function PrayerTimeline() {
                 />
               )}
               
-              {/* Node Circle */}
-              {isLoading ? (
-                <div 
-                  className="relative z-10 h-5 w-5 rounded-full border-[3px] border-muted-foreground/20 bg-muted/10"
-                />
-              ) : (
-                <motion.div 
-                  layout
-                  className={cn(
-                    "relative z-10 h-5 w-5 rounded-full border-[3px] transition-colors duration-500",
+              {/* Node Circle (always motion.div to prevent unmounting/remounting) */}
+              <motion.div 
+                className={cn(
+                  "relative z-10 h-5 w-5 rounded-full border-[3px]",
+                  isLoading ? "border-muted-foreground/20 bg-muted/10" : 
+                  "transition-colors duration-500",
+                  !isLoading && (
                     isCurrent ? "border-primary bg-background shadow-[0_0_20px_var(--color-time-glow)] ring-4 ring-primary/20" : 
                     isPast ? "border-foreground/30 bg-foreground/10" : 
                     "border-muted-foreground/40 bg-background"
-                  )}
-                />
-              )}
+                  )
+                )}
+              />
             </div>
 
             {/* Content */}
             <div className="flex flex-col pt-0.5 w-full">
               <div className="flex items-baseline justify-between">
-                {isLoading ? (
-                  <h3 className="text-xl font-heading font-medium text-muted-foreground/40">
-                    {PRAYER_DISPLAY_NAMES[prayerName]}
-                  </h3>
-                ) : (
-                  <motion.h3 
-                    layout
-                    className={cn(
-                      "text-xl font-heading font-medium transition-colors",
+                {/* always motion.h3 to prevent unmounting/remounting */}
+                <motion.h3 
+                  className={cn(
+                    "text-xl font-heading font-medium",
+                    isLoading ? "text-muted-foreground/40" : 
+                    "transition-colors duration-500",
+                    !isLoading && (
                       isCurrent ? "text-primary font-bold" : isPast ? "text-muted-foreground/50" : "text-foreground"
-                    )}
-                  >
-                    {PRAYER_DISPLAY_NAMES[prayerName]}
-                  </motion.h3>
-                )}
+                    )
+                  )}
+                >
+                  {PRAYER_DISPLAY_NAMES[prayerName]}
+                </motion.h3>
                 
-                {isLoading ? (
-                  <span className="text-lg font-medium text-muted-foreground/20">
-                    --:--
-                  </span>
-                ) : (
-                  <span className={cn(
-                    "text-lg font-medium transition-colors",
+                <span className={cn(
+                  "text-lg font-medium",
+                  isLoading ? "text-muted-foreground/20" : 
+                  "transition-colors duration-500",
+                  !isLoading && (
                     isCurrent ? "text-primary font-bold" : isPast ? "text-muted-foreground" : "text-foreground"
-                  )}>
-                    {formatTime(time!, is24h)}
-                  </span>
-                )}
+                  )
+                )}>
+                  {isLoading ? "--:--" : formatTime(time!, is24h)}
+                </span>
               </div>
 
               {/* Countdown & Expansion */}
