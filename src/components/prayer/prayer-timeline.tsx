@@ -97,7 +97,7 @@ export function PrayerTimeline() {
             key={prayerName}
             className={cn(
               "timeline-node relative flex items-start gap-8 py-5 group transition-opacity duration-300 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary",
-              isPast && "opacity-70",
+              isPast && "opacity-50",
               isFuture && "cursor-pointer hover:bg-muted/20"
             )}
             role={isFuture ? "button" : "listitem"}
@@ -117,7 +117,7 @@ export function PrayerTimeline() {
             {index < PRAYER_SEQUENCE.length - 1 && (
               <div className={cn(
                 "absolute left-[2.25rem] top-[2.5rem] bottom-[-1.25rem] -translate-x-1/2 -z-10 rounded-full",
-                isRailCompleted ? "w-[3px] bg-foreground/30" : "w-[1px] bg-border/50"
+                isRailCompleted ? "w-[3px] bg-primary/50" : "w-[1px] bg-border/50"
               )} />
             )}
             {/* Node marker container */}
@@ -159,7 +159,7 @@ export function PrayerTimeline() {
                 
                 <span className={cn(
                   "text-lg font-medium transition-colors",
-                  isCurrent ? "text-primary font-bold" : isPast ? "text-foreground/60" : "text-muted-foreground"
+                  isCurrent ? "text-primary font-bold" : isPast ? "text-muted-foreground" : "text-foreground"
                 )}>
                   {formatTime(time, is24h)}
                 </span>
