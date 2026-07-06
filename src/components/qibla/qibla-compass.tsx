@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
 import { Compass, AlertCircle, MapPin } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { getQiblaBearing } from '@/lib/qibla/calculate';
 
@@ -46,14 +45,12 @@ export function QiblaCompass() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPermissionState('prompt');
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPermissionState('granted');
-      if ('ondeviceorientationabsolute' in window) {
+      if ('ondeviceorientationabsolute' in (window as any)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        window.addEventListener('deviceorientationabsolute', handleOrientation as any, true);
+        (window as any).addEventListener('deviceorientationabsolute', handleOrientation as any, true);
       } else {
         window.addEventListener('deviceorientation', handleOrientation, true);
       }
