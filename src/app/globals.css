@@ -129,15 +129,15 @@
 }
 
 [data-time-of-day="golden"] {
-  --time-bg: oklch(0.85 0.06 60); /* Golden amber */
-  --time-bg-end: oklch(0.8 0.08 40); /* Warm coral */
-  --time-card: oklch(0.9 0.04 60);
-  --time-text: oklch(0.2 0.05 60);
-  --time-accent: oklch(0.65 0.12 60); /* Muted amber/terracotta */
-  --time-glow: oklch(0.65 0.12 60 / 30%);
+  --time-bg: oklch(0.55 0.14 45); /* Sunset Terracotta */
+  --time-bg-end: oklch(0.24 0.05 35); /* Dark Clay Charcoal */
+  --time-card: oklch(0.28 0.04 35 / 60%); /* Semitranslucent Dark Amber-Grey */
+  --time-text: oklch(0.94 0.02 55); /* Warm Glowing Cream */
+  --time-accent: oklch(0.72 0.18 45); /* Burnt Copper */
+  --time-glow: oklch(0.72 0.18 45 / 30%);
   
-  --logo-base: #0F4C4C;
-  --logo-sun: #D35400; /* Warm amber */
+  --logo-base: #FAFAF8; /* Light base logo to contrast with dark theme background */
+  --logo-sun: #E67E22; /* Burnt orange sun */
 }
 
 [data-time-of-day="night"] {
