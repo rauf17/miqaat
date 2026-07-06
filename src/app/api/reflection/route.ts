@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     const prompt = `Write a short (2-4 sentence), warm, non-preachy daily reflection for a Muslim user. Reference the current date (${dateStr}). Do not claim religious authority or issue rulings. Keep it uplifting and contemplative.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -27,7 +27,6 @@ export async function POST(request: Request) {
         }],
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 150,
         }
       })
     });
