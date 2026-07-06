@@ -5,12 +5,12 @@ import { LocationSetup } from '@/components/prayer/location-setup';
 import { PrayerTimeline } from '@/components/prayer/prayer-timeline';
 import { HijriHeroCard } from '@/components/prayer/hijri-hero-card';
 import { HijriMonthView } from '@/components/prayer/hijri-month-view';
-import { SettingsSheet } from '@/components/prayer/settings-sheet';
 import { SplashScreen } from '@/components/ui/splash-screen';
 import { AnimatedLogo } from '@/components/brand/animated-logo';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { cn } from '@/lib/utils';
-import { CalendarDays, Clock } from 'lucide-react';
+import { CalendarDays, Clock, Settings } from 'lucide-react';
+import Link from 'next/link';
 import { NotificationScheduler } from '@/components/prayer/notification-scheduler';
 
 export default function Home() {
@@ -40,7 +40,13 @@ export default function Home() {
         <header className="flex items-center justify-between w-full pb-4">
           <AnimatedLogo />
           <div className="z-50">
-            <SettingsSheet />
+            <Link 
+              href="/settings"
+              className="inline-flex p-2 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Open settings"
+            >
+              <Settings className="w-5 h-5 text-foreground" />
+            </Link>
           </div>
         </header>
 
