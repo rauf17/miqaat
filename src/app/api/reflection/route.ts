@@ -1,9 +1,70 @@
 import { NextResponse } from 'next/server';
 
+function isValidReflection(output: string): boolean {
+  if (!output || typeof output !== 'string' || output.trim().length < 10) return false;
+  
+  const forbiddenWords = ['surah', 'ayah', 'bukhari', 'muslim', 'tirmidhi', 'narrated', 'prophet said', 'allah says'];
+  const lowerOutput = output.toLowerCase();
+  
+  if (forbiddenWords.some(word => lowerOutput.includes(word))) {
+    return false;
+  }
+  
+  if ((output.match(/"/g) || []).length >= 2) {
+    return false;
+  }
+  
+  return true;
+}
+
+async function generateWithGemini(prompt: string, apiKey: string): Promise<string> {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.7 }
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Gemini API Error: ${await response.text()}`);
+  }
+
+  const data = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  return text || '';
+}
+
+async function generateWithGroq(prompt: string, apiKey: string): Promise<string> {
+  const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Groq API Error: ${await response.text()}`);
+  }
+
+  const data = await response.json();
+  const text = data?.choices?.[0]?.message?.content;
+  return text || '';
+}
+
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
+    const geminiKey = process.env.GEMINI_API_KEY;
+    const groqKey = process.env.GROQ_API_KEY;
+    
+    if (!geminiKey) {
       return NextResponse.json({ error: 'Gemini API key is not configured.' }, { status: 500 });
     }
 
@@ -26,52 +87,46 @@ CRITICAL RULES:
 3. You are merely offering a brief, uplifting personal reflection on the provided text, without issuing religious rulings.
 4. Keep it contemplative and rooted in daily life.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
+    let finalOutput = '';
+
+    // Primary: Gemini
+    try {
+      const geminiText = await generateWithGemini(prompt, geminiKey);
+      const output = geminiText.trim();
+      
+      if (isValidReflection(output)) {
+        finalOutput = output;
+        console.log('Reflection generated using Gemini.');
+      } else {
+        console.warn('Gemini response failed validation:', output);
+      }
+    } catch (err) {
+      console.warn('Gemini generation failed:', err);
+    }
+
+    // Fallback: Groq
+    if (!finalOutput && groqKey) {
+      console.log('Falling back to Groq for reflection generation...');
+      try {
+        const groqText = await generateWithGroq(prompt, groqKey);
+        const output = groqText.trim();
+        
+        if (isValidReflection(output)) {
+          finalOutput = output;
+          console.log('Reflection generated using Groq.');
+        } else {
+          console.warn('Groq response failed validation:', output);
         }
-      })
-    });
-
-    if (!response.ok) {
-      console.error('Gemini API Error:', await response.text());
-      return NextResponse.json({ error: 'Failed to generate reflection.' }, { status: 500 });
+      } catch (err) {
+        console.error('Groq generation failed:', err);
+      }
     }
 
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!text || typeof text !== 'string' || text.trim().length < 10) {
-      return NextResponse.json({ error: 'Malformed or empty response from Gemini.' }, { status: 500 });
+    if (!finalOutput) {
+      return NextResponse.json({ error: 'All providers failed or returned invalid responses.' }, { status: 500 });
     }
 
-    const output = text.trim();
-
-    // Validation: Check for hallucinated citations or quotes
-    // We reject if it contains forbidden source words to ensure the AI doesn't try to cite anything itself.
-    const forbiddenWords = ['surah', 'ayah', 'bukhari', 'muslim', 'tirmidhi', 'narrated', 'prophet said', 'allah says'];
-    const lowerOutput = output.toLowerCase();
-    
-    if (forbiddenWords.some(word => lowerOutput.includes(word))) {
-       console.error('Rejected AI response due to forbidden citation-like words:', output);
-       return NextResponse.json({ error: 'Response failed safety validation.' }, { status: 500 });
-    }
-    
-    // Reject if it has quotation marks (indicating it's trying to quote scripture)
-    if ((output.match(/"/g) || []).length >= 2) {
-       console.error('Rejected AI response due to quotation marks:', output);
-       return NextResponse.json({ error: 'Response failed safety validation (quotations).' }, { status: 500 });
-    }
-
-    return NextResponse.json({ text: output });
+    return NextResponse.json({ text: finalOutput });
   } catch (error) {
     console.error('Reflection API Route Error:', error);
     return NextResponse.json({ error: 'Internal Server Error.' }, { status: 500 });
