@@ -4,14 +4,17 @@ import * as React from 'react';
 import { LocationSetup } from '@/components/prayer/location-setup';
 import { PrayerTimeline } from '@/components/prayer/prayer-timeline';
 import { HijriHeroCard } from '@/components/prayer/hijri-hero-card';
+import { HijriMonthView } from '@/components/prayer/hijri-month-view';
 import { SettingsSheet } from '@/components/prayer/settings-sheet';
 import { SplashScreen } from '@/components/ui/splash-screen';
 import { AnimatedLogo } from '@/components/brand/animated-logo';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { cn } from '@/lib/utils';
+import { CalendarDays, Clock } from 'lucide-react';
 
 export default function Home() {
   const [isMounted, setIsMounted] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<'timeline' | 'calendar'>('timeline');
   const { lat, lng } = useLocationStore();
   const hasLocation = lat !== null && lng !== null;
 
@@ -56,8 +59,38 @@ export default function Home() {
             <LocationSetup />
           </div>
         ) : (
-          <div className="w-full mt-4">
-            <PrayerTimeline />
+          <div className="w-full mt-4 flex flex-col items-center">
+            {/* View Toggle */}
+            <div className="flex bg-muted/30 p-1 rounded-full mb-6 border border-border/50 backdrop-blur-md">
+              <button
+                onClick={() => setViewMode('timeline')}
+                className={cn(
+                  "flex items-center gap-2 px-6 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                  viewMode === 'timeline' 
+                    ? "bg-card text-foreground shadow-sm ring-1 ring-border/50" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Clock className="w-4 h-4" />
+                Timeline
+              </button>
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={cn(
+                  "flex items-center gap-2 px-6 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                  viewMode === 'calendar' 
+                    ? "bg-card text-foreground shadow-sm ring-1 ring-border/50" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <CalendarDays className="w-4 h-4" />
+                Calendar
+              </button>
+            </div>
+
+            <div className="w-full transition-all duration-500 ease-in-out">
+              {viewMode === 'timeline' ? <PrayerTimeline /> : <HijriMonthView />}
+            </div>
           </div>
         )}
       </div>
