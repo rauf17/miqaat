@@ -90,8 +90,12 @@ export function QiblaCompass() {
   // If we have heading, dial rotation is -heading so North is aligned to reality.
   // If no heading (fallback), dial is 0 (North up).
   const dialRotation = heading !== null ? -heading : 0;
-  // The needle is inside the dial, so we just rotate it to the Qibla bearing.
-  const needleRotation = qiblaBearing ?? 0;
+  
+  // The needle rotates independently on top of the dial.
+  // Its screen rotation is the physical Qibla bearing minus our current heading.
+  const needleRotation = qiblaBearing !== null && heading !== null 
+    ? qiblaBearing - heading 
+    : (qiblaBearing ?? 0);
   
   // Calculate how close we are facing to Qibla (0 = perfectly facing, 180 = opposite)
   const isFacingQibla = heading !== null && qiblaBearing !== null 
@@ -142,13 +146,15 @@ export function QiblaCompass() {
 
         {/* The SVG Dial */}
         <div className="relative w-72 h-72 rounded-full border border-border/30 bg-card/20 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.05)] flex items-center justify-center overflow-hidden z-10">
+          
+          {/* Dial Layer */}
           <motion.div 
-            className="w-full h-full relative"
+            className="absolute inset-0 w-full h-full"
             animate={{ rotate: dialRotation }}
             transition={{ type: "spring", stiffness: 50, damping: 20, mass: 1 }}
           >
             {/* Compass Marks */}
-            <svg viewBox="0 0 200 200" className="w-full h-full text-foreground/40 absolute inset-0">
+            <svg viewBox="0 0 200 200" className="w-full h-full text-foreground/40">
               <g className="font-heading text-[10px] font-semibold" fill="currentColor">
                 <text x="100" y="25" textAnchor="middle" alignmentBaseline="middle">N</text>
                 <text x="175" y="100" textAnchor="middle" alignmentBaseline="middle">E</text>
@@ -174,21 +180,23 @@ export function QiblaCompass() {
                   />
                 );
               })}
+            </svg>
+          </motion.div>
 
-              {/* Qibla Needle */}
-              <motion.g 
-                initial={false}
-                animate={{ rotate: needleRotation }}
-                transition={{ type: "spring", stiffness: 40, damping: 15, mass: 1 }}
-                style={{ originX: "100px", originY: "100px" }}
-              >
-                {/* Needle Base Line */}
-                <line x1="100" y1="100" x2="100" y2="40" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" className="text-primary/50" />
-                {/* Kaaba / Arrow Indicator */}
-                <polygon points="90,45 100,20 110,45 100,40" className="fill-primary" />
-                <circle cx="100" cy="100" r="4" className="fill-primary" />
-                <circle cx="100" cy="100" r="2" className="fill-background" />
-              </motion.g>
+          {/* Needle Layer */}
+          <motion.div 
+            className="absolute inset-0 w-full h-full"
+            initial={false}
+            animate={{ rotate: needleRotation }}
+            transition={{ type: "spring", stiffness: 40, damping: 15, mass: 1 }}
+          >
+            <svg viewBox="0 0 200 200" className="w-full h-full">
+              {/* Needle Base Line */}
+              <line x1="100" y1="100" x2="100" y2="40" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" className="text-primary/50" />
+              {/* Kaaba / Arrow Indicator */}
+              <polygon points="90,45 100,20 110,45 100,40" className="fill-primary" />
+              <circle cx="100" cy="100" r="4" className="fill-primary" />
+              <circle cx="100" cy="100" r="2" className="fill-background" />
             </svg>
           </motion.div>
         </div>
