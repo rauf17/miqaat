@@ -42,15 +42,27 @@ export function LocationSetup() {
             'auto'
           );
         } catch {
-          setError('Failed to reverse geocode location. Please enter manually.');
+          // If reverse geocoding fails, fallback to coordinates with generic name
+          // so the user isn't stuck on the setup screen.
+          setLocation(
+            {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              city: 'Unknown',
+              country: 'Location',
+            },
+            'auto'
+          );
+          setError('Failed to fetch city name, but coordinates were saved successfully.');
         } finally {
           setLoading(false);
         }
       },
       () => {
-        setError('Location access denied or failed. Please enter manually.');
+        setError('Location access denied or timed out. Please enter manually.');
         setLoading(false);
-      }
+      },
+      { timeout: 10000, maximumAge: 60000 }
     );
   };
 
