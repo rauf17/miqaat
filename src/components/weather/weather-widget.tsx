@@ -6,6 +6,8 @@ import { useLocationStore } from '@/lib/store/locationStore';
 import { useWeatherStore } from '@/lib/store/weatherStore';
 import { getWeatherIcon } from '@/lib/weather/utils';
 import { CloudOff } from 'lucide-react';
+import { getMoonPhase } from '@/lib/weather/moon-phase';
+import { MoonPhaseIcon } from '@/components/weather/moon-phase-icon';
 
 export function WeatherWidget() {
   const { lat, lng } = useLocationStore();
@@ -41,6 +43,13 @@ export function WeatherWidget() {
             </span>
           )}
         </span>
+        <div className="w-[1px] h-3 bg-border/50 mx-1"></div>
+        {(() => {
+          const moon = getMoonPhase(new Date());
+          return (
+            <MoonPhaseIcon phase={moon.phase} className="w-3.5 h-3.5 text-foreground/70 group-hover:text-foreground transition-colors" />
+          );
+        })()}
       </div>
     </Link>
   );

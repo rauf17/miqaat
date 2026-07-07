@@ -10,6 +10,8 @@ import { LocationSetup } from '@/components/prayer/location-setup';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { useWeatherStore } from '@/lib/store/weatherStore';
 import { getWeatherIcon, getWeatherDescription } from '@/lib/weather/utils';
+import { getMoonPhase } from '@/lib/weather/moon-phase';
+import { MoonPhaseIcon } from '@/components/weather/moon-phase-icon';
 
 export default function WeatherPage() {
   const { lat, lng } = useLocationStore();
@@ -164,9 +166,9 @@ export default function WeatherPage() {
                   </div>
                 </div>
 
-                {/* Solar Data */}
+                {/* Solar & Lunar Data */}
                 <div className="bg-card/20 rounded-3xl border border-border/30 p-6 backdrop-blur-md flex flex-col gap-6">
-                  <h3 className="font-heading text-lg font-semibold mb-2">Solar Times</h3>
+                  <h3 className="font-heading text-lg font-semibold mb-2">Sun & Moon</h3>
                   {data.daily?.sunrise?.[0] && (
                     <div className="flex items-center gap-4 bg-card/30 p-4 rounded-2xl border border-border/20">
                       <Sunrise className="w-8 h-8 text-primary/80" />
@@ -189,6 +191,23 @@ export default function WeatherPage() {
                       </div>
                     </div>
                   )}
+                  
+                  {/* Moon Phase */}
+                  {(() => {
+                    const moon = getMoonPhase(new Date());
+                    return (
+                      <div className="flex items-center gap-4 bg-card/30 p-4 rounded-2xl border border-border/20">
+                        <MoonPhaseIcon phase={moon.phase} className="w-8 h-8 text-primary/80" />
+                        <div>
+                          <div className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">Moon Phase</div>
+                          <div className="text-lg font-medium">
+                            {moon.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{moon.illumination}% illuminated</div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
               </div>
