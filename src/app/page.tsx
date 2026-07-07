@@ -56,7 +56,7 @@ function WeatherInline() {
   }
 
   const { tempC, conditionCode } = data.current;
-  const Icon = getWeatherIcon(conditionCode);
+  const Icon = getWeatherIcon(conditionCode, data.current.isDay === 1);
 
   return (
     <Link href="/weather" className="flex items-center gap-1.5 hover:text-foreground transition-colors group">

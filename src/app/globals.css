@@ -10,6 +10,8 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-heading); /* Fix: this was referencing var(--font-sans) before! */
+  /* MKT-005: register --font-arabic so the `font-arabic` Tailwind utility resolves. */
+  --font-arabic: var(--font-arabic);
   
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -56,13 +58,37 @@
   --color-time-glow: var(--time-glow);
 }
 
-/* Enable gradient transition across states in modern browsers */
+/* Enable gradient transition across states in modern browsers.
+   THM-002: register ALL animatable theme tokens, not just --time-bg
+   and --time-bg-end. Without @property registration, color custom
+   properties cannot be interpolated by the browser, so transitions
+   on unregistered tokens snap instead of morph. */
 @property --time-bg {
   syntax: "<color>";
   inherits: true;
   initial-value: transparent;
 }
 @property --time-bg-end {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --time-card {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --time-text {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --time-accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+@property --time-glow {
   syntax: "<color>";
   inherits: true;
   initial-value: transparent;
@@ -131,13 +157,18 @@
 }
 
 [data-time-of-day="golden"] {
-  --time-bg: oklch(0.68 0.16 55); /* Sunset Amber */
+  /* THM-004 / A11Y-017: darkened the amber top of the gradient from
+     oklch(0.68 0.16 55) to oklch(0.52 0.15 55) so that body text
+     (pale ivory) clears WCAG AA 4.5:1 contrast on the amber portion.
+     Previously ~2.1:1 (fail), now ~5.2:1 (pass). The bottom of the
+     gradient stays deep plum so the sunset feel is preserved. */
+  --time-bg: oklch(0.52 0.15 55); /* Deepened Sunset Amber */
   --time-bg-end: oklch(0.22 0.06 310); /* Deep Velvet Plum */
   --time-card: oklch(0.28 0.04 310 / 65%); /* Translucent Smoky Plum */
   --time-text: oklch(0.96 0.01 65); /* Pale Soft Ivory */
-  --time-accent: oklch(0.78 0.16 65); /* Luminescent Sunburst Gold */
-  --time-glow: oklch(0.78 0.16 65 / 30%);
-  
+  --time-accent: oklch(0.85 0.14 65); /* Brightened Sunburst Gold (was 0.78, now passes 3:1 on deepened amber) */
+  --time-glow: oklch(0.85 0.14 65 / 30%);
+
   --logo-base: #FAFAF8; /* Ivory base logo */
   --logo-sun: #F1C40F; /* Golden sun */
   --logo-star-opacity: 0;
@@ -189,15 +220,49 @@
     scrollbar-gutter: stable;
   }
   
-  html.theme-loaded, .theme-loaded body, .theme-loaded .card, .theme-loaded [data-theme-transition] {
-    transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity, --time-bg, --time-bg-end;
-    transition-duration: 60s;
+  /* THM-001: reduced transition duration from 60s to 1.5s. A 60s
+     transition never visually completes during a typical session and
+     causes "stuck theme" perception. 1.5s is a comfortable morph.
+     THM-003: broadened selector from .card + [data-theme-transition]
+     to * (all elements) so that bg-muted, text-primary, border-border,
+     etc. also morph instead of snapping. Safe at 1.5s; would be
+     expensive at 60s. */
+  html.theme-loaded *, .theme-loaded *::before, .theme-loaded *::after {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity, --time-bg, --time-bg-end, --time-card, --time-text, --time-accent, --time-glow;
+    transition-duration: 1.5s;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   @media (prefers-reduced-motion: reduce) {
-    html.theme-loaded, .theme-loaded body, .theme-loaded .card, .theme-loaded [data-theme-transition] {
+    html.theme-loaded *, .theme-loaded *::before, .theme-loaded *::after {
       transition-duration: 0.1s;
     }
   }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Unified reduced-motion guard (audit Theme 1, THM-019, A11Y-015).
+   Matches BOTH the OS preference AND the in-app Settings toggle
+   (mirrored to [data-reduce-motion="true"] by useReduceMotion()).
+   This is a defense-in-depth backstop — per-component useReduceMotion()
+   checks handle framer-motion animations; this CSS guard handles
+   keyframes, transitions, and any animation the per-component checks
+   miss.
+   ────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+[data-reduce-motion='true'] *,
+[data-reduce-motion='true'] *::before,
+[data-reduce-motion='true'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }

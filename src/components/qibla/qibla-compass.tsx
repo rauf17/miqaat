@@ -5,34 +5,82 @@ import { motion } from 'framer-motion';
 import { Compass, AlertCircle, MapPin } from 'lucide-react';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { getQiblaBearing } from '@/lib/qibla/calculate';
+import { useReduceMotion } from '@/lib/theme/use-reduce-motion';
 
 export function QiblaCompass() {
   const { lat, lng } = useLocationStore();
   const [heading, setHeading] = React.useState<number | null>(null);
   const [permissionState, setPermissionState] = React.useState<'prompt' | 'granted' | 'denied' | 'unsupported' | 'unknown'>('unknown');
+  const reduceMotion = useReduceMotion();
 
   const qiblaBearing = React.useMemo(() => {
     if (lat === null || lng === null) return null;
-    return getQiblaBearing(lat, lng);
+    try {
+      return getQiblaBearing(lat, lng);
+    } catch {
+      // validateCoordinates threw — invalid lat/lng. Return null so the
+      // UI shows '--' rather than crashing (audit QIB-010).
+      return null;
+    }
+  }, [lat, lng]);
+
+  // rAF throttling refs (QIB-002). Orientation events fire at 60-100Hz;
+  // without batching, each event triggers a re-render + spring re-target.
+  const rafRef = React.useRef<number | null>(null);
+  const pendingHeadingRef = React.useRef<number | null>(null);
+
+  // Simplified magnetic declination estimate (QIB-001).
+  // iOS `webkitCompassHeading` is true-north (Apple applies declination
+  // internally). Android `deviceorientationabsolute.alpha` is magnetic-
+  // north, so we must add declination to convert to true-north for
+  // comparison with the Qibla bearing (which is true-north).
+  // This is a coarse dipole approximation (~±5° accuracy) — not survey-
+  // grade, but far better than the ±20° error from ignoring it. For a
+  // production-grade fix, swap in a WMM bundle (see audit QIB-001).
+  const declinationEstimate = React.useMemo(() => {
+    if (lat === null || lng === null) return 0;
+    // Coarse dipole model: declination ≈ -10.5 * cos(lng_rad) * tan(lat_rad)
+    // (valid for ~2025, secular drift ~-0.2°/yr). Sign convention:
+    // positive = east (needle points east of true north).
+    const latRad = (lat * Math.PI) / 180;
+    // Magnetic pole ~80°N, 72°W for the dipole approximation
+    const lngRad = ((lng + 72) * Math.PI) / 180;
+    const dec = -10.5 * Math.cos(lngRad) * Math.tan(latRad);
+    return Number.isFinite(dec) ? dec : 0;
   }, [lat, lng]);
 
   const handleOrientation = React.useCallback((event: DeviceOrientationEvent) => {
     let newHeading: number | null = null;
-    
-    // iOS
-    if ('webkitCompassHeading' in event) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      newHeading = (event as any).webkitCompassHeading;
-    } 
-    // Android Absolute
-    else if (event.absolute && event.alpha !== null) {
-      newHeading = 360 - event.alpha;
+
+    // iOS — already true-north
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const wch = (event as any).webkitCompassHeading;
+    if (typeof wch === 'number' && Number.isFinite(wch)) {
+      newHeading = wch;
+    }
+    // Android Absolute — magnetic-north, apply declination (QIB-001)
+    else if (event.absolute && typeof event.alpha === 'number' && Number.isFinite(event.alpha)) {
+      newHeading = (360 - event.alpha + declinationEstimate + 360) % 360;
+    }
+    // Fallback: alpha present even if absolute is undefined (Firefox Android, QIB-017)
+    else if (typeof event.alpha === 'number' && Number.isFinite(event.alpha)) {
+      newHeading = (360 - event.alpha + declinationEstimate + 360) % 360;
     }
 
-    if (newHeading !== null) {
-      setHeading(newHeading);
+    if (newHeading !== null && Number.isFinite(newHeading)) {
+      // QIB-002: batch via rAF instead of setState on every event
+      pendingHeadingRef.current = newHeading;
+      if (rafRef.current !== null) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        const pending = pendingHeadingRef.current;
+        if (pending !== null) {
+          pendingHeadingRef.current = null;
+          setHeading(pending);
+        }
+      });
     }
-  }, []);
+  }, [declinationEstimate]);
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -61,6 +109,11 @@ export function QiblaCompass() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       window.removeEventListener('deviceorientationabsolute', handleOrientation as any, true);
       window.removeEventListener('deviceorientation', handleOrientation, true);
+      // Cancel any pending rAF (QIB-002)
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
     };
   }, [handleOrientation]);
 
@@ -129,13 +182,17 @@ export function QiblaCompass() {
       )}
 
       {/* Compass UI */}
-      <div className="relative flex flex-col items-center justify-center py-8">
+      <div
+        className="relative flex flex-col items-center justify-center py-8"
+        role="img"
+        aria-label={`Qibla compass${qiblaBearing !== null ? `, bearing ${Math.round(qiblaBearing)}° from true north` : ''}`}
+      >
         
         {/* Glow effect when facing Qibla */}
         <motion.div 
           className="absolute inset-0 bg-primary/20 blur-3xl rounded-full -z-20"
           animate={{ opacity: isFacingQibla ? 1 : 0, scale: isFacingQibla ? 1.2 : 0.8 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.8, ease: "easeOut" }}
         />
 
         {/* The SVG Dial & Compass Housing */}
@@ -154,7 +211,7 @@ export function QiblaCompass() {
           <motion.div 
             className="absolute inset-0 w-full h-full"
             animate={{ rotate: dialRotation }}
-            transition={{ type: "spring", stiffness: 50, damping: 20, mass: 1 }}
+            transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 50, damping: 20, mass: 1 }}
           >
             {/* Compass Marks & Fixed Kaaba Indicator */}
             <svg viewBox="0 0 200 200" className="w-full h-full text-foreground/40">
@@ -208,9 +265,12 @@ export function QiblaCompass() {
             {qiblaBearing !== null ? Math.round(qiblaBearing) : '--'}°
           </div>
           {isFacingQibla && (
-             <motion.p 
-               initial={{ opacity: 0, y: 5 }}
+             <motion.p
+               role="status"
+               aria-live="polite"
+               initial={reduceMotion ? false : { opacity: 0, y: 5 }}
                animate={{ opacity: 1, y: 0 }}
+               transition={reduceMotion ? { duration: 0 } : undefined}
                className="text-sm font-medium text-primary"
              >
                You are facing the Qibla

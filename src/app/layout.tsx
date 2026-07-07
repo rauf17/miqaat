@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Lora, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Lora, Plus_Jakarta_Sans, Geist_Mono, Noto_Naskh_Arabic } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NightAtmosphere } from "@/components/ui/night-atmosphere";
 import { WeatherFetcher } from "@/components/weather/weather-fetcher";
@@ -21,6 +21,22 @@ const lora = Lora({
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-brand",
   subsets: ["latin"],
+});
+
+// MKT-018: define --font-geist-mono so font-mono utility works correctly
+// (was referenced in globals.css but never defined).
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+// MKT-005: define --font-arabic for Quranic verse display and the brand
+// tooltip wordmark (was referenced via font-arabic class but never defined,
+// causing Arabic text to fall back to Inter which has poor Arabic glyphs).
+const notoNaskhArabic = Noto_Naskh_Arabic({
+  variable: "--font-arabic",
+  subsets: ["arabic"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -60,6 +76,24 @@ export const viewport = {
   ],
 };
 
+// PSP-021: JSON-LD structured data for WebApplication. Helps search
+// engines understand the app is a LifestyleApplication and can appear
+// in app-discovery surfaces.
+const webAppJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Miqaat",
+  description: "Islamic daily companion — prayer times, Hijri calendar, Qibla compass, and daily reflections.",
+  applicationCategory: "LifestyleApplication",
+  operatingSystem: "Any (web browser)",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  url: "https://miqaat-two.vercel.app",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,7 +103,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${lora.variable} ${plusJakartaSans.variable} h-full antialiased`}
+      className={`${inter.variable} ${lora.variable} ${plusJakartaSans.variable} ${geistMono.variable} ${notoNaskhArabic.variable} h-full antialiased`}
     >
       <head>
         <script
@@ -90,6 +124,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col font-sans pb-32 sm:pb-40">
+        {/* PSP-021: JSON-LD WebApplication structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppJsonLd) }}
+        />
         {/*
           Skip-to-content link (audit A11Y-003, WCAG 2.4.1 Level A).
           Visually hidden until focused, then appears top-left. Lets
@@ -112,7 +151,7 @@ export default function RootLayout({
             </div>
           </div>
         </noscript>
-        <NightAtmosphere className="fixed text-foreground opacity-30 z-0 mix-blend-overlay pointer-events-none" />
+        <NightAtmosphere className="fixed text-foreground opacity-0 z-0 mix-blend-overlay pointer-events-none" />
         <div className="relative z-10 flex-1 flex flex-col">
           <ThemeProvider>
             <WeatherFetcher />

@@ -1,17 +1,28 @@
-import { 
-  Sun, 
-  Cloud, 
-  CloudRain, 
-  CloudLightning, 
-  Snowflake, 
+import {
+  Sun,
+  Moon,
+  Cloud,
+  CloudMoon,
+  CloudRain,
+  CloudLightning,
+  Snowflake,
   CloudDrizzle,
   CloudFog,
-  CloudOff
+  CloudOff,
 } from 'lucide-react';
 
-export function getWeatherIcon(code: number | undefined) {
+/**
+ * Map a WMO weather code to a Lucide icon.
+ *
+ * WTH-006: accepts an optional `isDay` parameter. Clear sky at night
+ * now returns Moon instead of Sun; mainly-clear/partly-cloudy at night
+ * returns CloudMoon. Callers should pass `data.current.isDay === 1`
+ * for current conditions.
+ */
+export function getWeatherIcon(code: number | undefined, isDay: boolean = true) {
   if (code === undefined) return CloudOff;
-  if (code === 0) return Sun; // Clear sky
+  if (code === 0) return isDay ? Sun : Moon; // Clear sky
+  if ((code === 1 || code === 2) && !isDay) return CloudMoon; // Mainly clear / partly cloudy at night
   if (code === 1 || code === 2 || code === 3) return Cloud; // Mainly clear, partly cloudy, overcast
   if (code === 45 || code === 48) return CloudFog; // Fog
   if (code >= 51 && code <= 57) return CloudDrizzle; // Drizzle
@@ -26,7 +37,10 @@ export function getWeatherIcon(code: number | undefined) {
 export function getWeatherDescription(code: number | undefined) {
   if (code === undefined) return 'Offline';
   if (code === 0) return 'Clear';
-  if (code === 1 || code === 2 || code === 3) return 'Cloudy';
+  // WTH-023: distinguish code 1/2/3 instead of collapsing all to "Cloudy"
+  if (code === 1) return 'Mainly Clear';
+  if (code === 2) return 'Partly Cloudy';
+  if (code === 3) return 'Overcast';
   if (code === 45 || code === 48) return 'Fog';
   if (code >= 51 && code <= 57) return 'Drizzle';
   if (code >= 61 && code <= 67) return 'Rain';

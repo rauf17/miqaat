@@ -8,9 +8,15 @@ export interface IslamicEvent {
 }
 
 export const MAJOR_EVENTS: IslamicEvent[] = [
+  { name: 'Islamic New Year', monthName: 'Muharram', day: 1, description: 'The start of the new Hijri year.' },
   { name: 'Ashura', monthName: 'Muharram', day: 10, description: 'The 10th of Muharram, a day of fasting and remembrance.' },
+  { name: 'Mawlid an-Nabi', monthName: 'Rabiʻ I', day: 12, description: 'Commemoration of the birth of Prophet Muhammad (peace be upon him). Observed by many, though dating varies by tradition.' },
+  { name: 'Isra and Miʻraj', monthName: 'Rajab', day: 27, description: 'The Night Journey and Ascension of the Prophet. Commonly observed on 27 Rajab, though dating varies by tradition.' },
+  { name: 'Nisf Shaʻban', monthName: 'Shaʻban', day: 15, description: 'The 15th of Shaʻban, a night of prayer and reflection for many.' },
   { name: 'Ramadan Begins', monthName: 'Ramadan', day: 1, description: 'The start of the holiest month of fasting, prayer, and reflection.' },
+  { name: 'Laylat al-Qadr (commonly observed)', monthName: 'Ramadan', day: 27, description: 'The Night of Power, most commonly observed on the 27th of Ramadan though the exact night is unknown.' },
   { name: 'Eid al-Fitr', monthName: 'Shawwal', day: 1, description: 'The Festival of Breaking the Fast, celebrating the end of Ramadan.' },
+  { name: 'Day of Arafah', monthName: 'Dhuʻl-Hijjah', day: 9, description: 'The Day of Arafah, the holiest day of the Islamic year, when pilgrims stand on the plain of Arafah.' },
   { name: 'Eid al-Adha', monthName: 'Dhuʻl-Hijjah', day: 10, description: 'The Festival of Sacrifice, culminating the Hajj pilgrimage.' },
 ];
 
