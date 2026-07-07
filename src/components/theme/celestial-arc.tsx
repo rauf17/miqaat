@@ -1,10 +1,11 @@
 'use client';
 
 import * as React from 'react';
+import { useRef } from 'react';
 import { useTimeOfDay } from '@/lib/theme/useTimeOfDay';
 import { useSettingsStore } from '@/lib/store/settingsStore';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform, useAnimationFrame, PanInfo } from 'framer-motion';
 
 function useCelestialProgress() {
   const { timeOfDay, sunrise, sunset } = useTimeOfDay();
@@ -63,15 +64,50 @@ export function CelestialArc() {
   const leftPercent = ((1 - Math.cos(angle)) / 2) * 100;
   const topPercent = 100 - 80 * Math.sin(angle);
 
+  // --- Interactive 3D Spinning Logic ---
+  const baseSpeed = -0.02; // Base speed of rotation (pixels per millisecond)
+  const rotation = useMotionValue(0);
+  const velocity = useMotionValue(reduceMotion ? 0 : baseSpeed);
+  const isDragging = useRef(false);
+
+  useAnimationFrame((time, delta) => {
+    if (reduceMotion) return;
+    
+    if (!isDragging.current) {
+      // Smoothly decay velocity back to the base speed
+      const currentV = velocity.get();
+      const decayFactor = 0.05; // Controls how fast it slows down after spinning
+      velocity.set(currentV + (baseSpeed - currentV) * decayFactor);
+    }
+    
+    // Apply velocity to rotation
+    rotation.set(rotation.get() + velocity.get() * delta);
+  });
+
+  // Map the rotation pixel value to the CSS background-position property
+  const backgroundPosition = useTransform(rotation, (r) => `${r}px center`);
+
+  const handlePanStart = () => {
+    isDragging.current = true;
+  };
+
+  const handlePan = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    // Directly update the rotation by the pan delta
+    rotation.set(rotation.get() + info.delta.x);
+    // Update velocity based on the pan delta so it carries momentum when released
+    // (Assuming ~16ms per frame for 60fps)
+    velocity.set(info.delta.x / 16);
+  };
+
+  const handlePanEnd = () => {
+    isDragging.current = false;
+  };
+
   return (
     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-70">
       
       {/* Required keyframes for the spinning effect */}
       <style>{`
-        @keyframes spinMoon {
-          from { background-position: 0% center; }
-          to { background-position: 200% center; }
-        }
         @keyframes pulseSun {
           0% { transform: scale(1) translate(-50%, -50%); opacity: 0.8; }
           100% { transform: scale(1.1) translate(-45%, -45%); opacity: 1; }
@@ -106,35 +142,38 @@ export function CelestialArc() {
 
         {/* The Celestial Body */}
         <motion.div
-          className="absolute origin-center"
+          className="absolute origin-center pointer-events-auto cursor-grab active:cursor-grabbing"
           style={{ 
             left: `${leftPercent}%`, 
             top: `${topPercent}%`,
             width: isNight ? '80px' : '100px',
             height: isNight ? '80px' : '100px',
             transform: 'translate(-50%, -50%)',
+            touchAction: 'none' // Prevent scrolling when spinning the sphere
           }}
           animate={{
             left: `${leftPercent}%`,
             top: `${topPercent}%`
           }}
           transition={reduceMotion ? { duration: 0 } : { duration: 1, ease: "linear" }}
+          onPanStart={handlePanStart}
+          onPan={handlePan}
+          onPanEnd={handlePanEnd}
         >
           {isNight ? (
             // PHOTOREALISTIC 3D MOON
-            <div className="relative w-full h-full flex items-center justify-center">
+            <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
               {/* Distant atmospheric glow */}
               <div className="absolute inset-[-50%] bg-blue-100/10 blur-2xl rounded-full mix-blend-screen" />
               <div className="absolute inset-[-20%] bg-blue-50/20 blur-xl rounded-full mix-blend-screen" />
               
               {/* The Moon Sphere */}
-              <div 
+              <motion.div 
                 className="relative w-16 h-16 rounded-full overflow-hidden"
                 style={{
                   backgroundImage: "url('/moon-texture.png')",
                   backgroundSize: "200% 100%",
-                  // Spin animation
-                  animation: reduceMotion ? 'none' : 'spinMoon 40s linear infinite',
+                  backgroundPosition,
                   // Complex 3D shading: dark side on bottom left, bright side on top right
                   boxShadow: `
                     inset -16px -16px 20px rgba(0,0,0,0.8),
@@ -146,7 +185,7 @@ export function CelestialArc() {
             </div>
           ) : (
             // BRILLIANT 3D SUN
-            <div className="relative w-full h-full flex items-center justify-center mix-blend-screen">
+            <div className="relative w-full h-full flex items-center justify-center mix-blend-screen pointer-events-none">
               {/* Intense outer corona */}
               <div 
                 className="absolute inset-[-60%] rounded-full opacity-60"
@@ -158,13 +197,12 @@ export function CelestialArc() {
               <div className="absolute inset-[-20%] rounded-full blur-xl bg-amber-500/40" />
               
               {/* The Sun Sphere */}
-              <div 
+              <motion.div 
                 className="relative w-16 h-16 rounded-full overflow-hidden"
                 style={{
                   backgroundImage: "url('/sun-texture.png')",
                   backgroundSize: "200% 100%",
-                  // Spin animation
-                  animation: reduceMotion ? 'none' : 'spinMoon 30s linear infinite',
+                  backgroundPosition,
                   // Complex 3D shading: bright hot spot in the center, fiery edges
                   boxShadow: `
                     inset -8px -8px 20px rgba(234, 88, 12, 0.8),
