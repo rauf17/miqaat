@@ -66,23 +66,36 @@ export function LocationSetup() {
     );
   };
 
-  const handleManualSearch = (e: React.FormEvent) => {
+  const handleManualSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     
-    // In a full implementation, this would call a forward-geocoding API to get lat/lng from the query
-    // For now, we mock the coordinates for the manual fallback, or just save the city
-    setLocation(
-      {
-        lat: 21.4225, // Mock Mecca coordinates
-        lng: 39.8262,
-        city: searchQuery,
-        country: 'Manual',
-      },
-      'manual'
-    );
-    setManualLocationOverride(true);
-    setSearchQuery('');
+    setLoading(true);
+    setError(null);
+    setManualLocationOverride(false); // Reset while loading
+
+    try {
+      const res = await fetch(`/api/geocode?city=${encodeURIComponent(searchQuery)}`);
+      if (!res.ok) throw new Error('City not found');
+      
+      const data = await res.json();
+      
+      setLocation(
+        {
+          lat: data.lat,
+          lng: data.lng,
+          city: data.city,
+          country: data.country,
+        },
+        'manual'
+      );
+      setManualLocationOverride(true);
+      setSearchQuery('');
+    } catch {
+      setError('Could not find that city. Please try another name.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -103,8 +116,8 @@ export function LocationSetup() {
           disabled={loading}
           className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 px-4 rounded-xl font-medium transition-colors hover:opacity-90 disabled:opacity-50"
         >
-          {loading ? <Loader2 className="animate-spin" size={20} /> : <MapPin size={20} />}
-          {loading ? 'Locating...' : 'Use Current Location'}
+          {loading && !searchQuery ? <Loader2 className="animate-spin" size={20} /> : <MapPin size={20} />}
+          {loading && !searchQuery ? 'Locating...' : 'Use Current Location'}
         </button>
 
         <div className="relative flex items-center py-2">
@@ -124,15 +137,17 @@ export function LocationSetup() {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search city manually..."
               aria-label="Search city manually"
-              className="w-full bg-input/50 border border-border rounded-xl py-3 pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              disabled={loading}
+              className="w-full bg-input/50 border border-border rounded-xl py-3 pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
             />
           </div>
           <button
             type="submit"
-            disabled={!searchQuery.trim()}
-            className="w-full py-3 px-4 rounded-xl bg-secondary text-secondary-foreground font-medium transition-colors hover:opacity-90 disabled:opacity-50"
+            disabled={!searchQuery.trim() || loading}
+            className="w-full py-3 px-4 rounded-xl bg-secondary text-secondary-foreground font-medium transition-colors hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            Search Manually
+            {loading && searchQuery ? <Loader2 className="animate-spin" size={18} /> : null}
+            {loading && searchQuery ? 'Searching...' : 'Search Manually'}
           </button>
         </form>
 
