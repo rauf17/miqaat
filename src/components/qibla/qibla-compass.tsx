@@ -87,18 +87,13 @@ export function QiblaCompass() {
     return null; // Handled by parent
   }
 
-  // The user reported the rotation is inverted on device (diverging instead of converging).
-  // This means the device orientation sensor (or Framer Motion) is applying rotation 
-  // in the opposite direction to standard CSS clockwise rotation on this platform.
-  // To fix this, we negate the heading so it turns the opposite way.
-  const correctedHeading = heading !== null ? -heading : null;
-
-  // Dial rotation counter-rotates against the corrected heading
-  const dialRotation = correctedHeading !== null ? -correctedHeading : 0;
+  // Dial rotation counter-rotates against the clockwise heading
+  // so that North physically aligns with real-world North.
+  const dialRotation = heading !== null ? -heading : 0;
   
   // Calculate how close we are facing to Qibla (0 = perfectly facing, 180 = opposite)
-  const isFacingQibla = correctedHeading !== null && qiblaBearing !== null 
-    ? Math.abs((((correctedHeading - qiblaBearing + 180) % 360) + 360) % 360 - 180) < 5
+  const isFacingQibla = heading !== null && qiblaBearing !== null 
+    ? Math.abs((((heading - qiblaBearing + 180) % 360) + 360) % 360 - 180) < 5
     : false;
 
   return (
