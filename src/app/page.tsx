@@ -30,7 +30,6 @@ import { OnboardingModal } from '@/components/prayer/onboarding-modal';
 import { AmbientBackground } from '@/components/theme/ambient-background';
 import { HeaderDropdown } from '@/components/layout/header-dropdown';
 import { FaqSection } from '@/components/layout/faq-section';
-import { SiteFooter } from '@/components/layout/site-footer';
 
 const PRAYER_DISPLAY_NAMES: Record<PrayerName, string> = {
   fajr: 'Fajr',
@@ -236,7 +235,6 @@ export default function Home() {
       </div>
       <div className="w-full pointer-events-auto">
         <FaqSection id="faq" />
-        <SiteFooter />
       </div>
     </main>
     </>

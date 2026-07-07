@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { motion, useReducedMotion, Variants, AnimatePresence } from 'framer-motion';
 import { LogoMark } from './logo-mark';
 import { cn } from '@/lib/utils';
@@ -10,6 +11,15 @@ interface AnimatedLogoProps {
   animateIn?: boolean;
 }
 
+/**
+ * Animated Miqaat brand logo. Renders as a real <a> via next/link so the
+ * logo is a genuine navigation affordance (previously it declared
+ * role="link" + tabIndex={0} but had no click handler — see audit P1-2).
+ *
+ * Clicking the logo navigates to /welcome (the marketing/landing page —
+ * the conventional destination for a brand logo in apps that have a
+ * separate marketing surface from the app shell).
+ */
 export function AnimatedLogo({ className, animateIn = false }: AnimatedLogoProps) {
   const [isHovered, setIsHovered] = React.useState(false);
   const prefersReducedMotion = useReducedMotion();
@@ -24,15 +34,15 @@ export function AnimatedLogo({ className, animateIn = false }: AnimatedLogoProps
   };
 
   return (
-    <div 
+    <Link
+      href="/welcome"
+      aria-label="Miqaat — about"
+      aria-describedby={isHovered ? "miqaat-tooltip" : undefined}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onFocus={() => setIsHovered(true)}
       onBlur={() => setIsHovered(false)}
-      tabIndex={0}
-      role="link"
-      aria-describedby={isHovered ? "miqaat-tooltip" : undefined}
-      className={cn("flex items-center gap-3 cursor-pointer group outline-none focus-visible:ring-2 rounded-lg relative", className)}
+      className={cn("flex items-center gap-3 group outline-none focus-visible:ring-2 rounded-lg relative", className)}
     >
       <LogoMark 
         className="w-10 h-10 shrink-0" 
@@ -77,6 +87,6 @@ export function AnimatedLogo({ className, animateIn = false }: AnimatedLogoProps
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </Link>
   );
 }

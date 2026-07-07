@@ -1,11 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Mail, Code2 } from 'lucide-react';
+import { Mail, Code2 } from 'lucide-react';
 import { AnimatedLogo } from '@/components/brand/animated-logo';
-import { SiteFooter } from '@/components/layout/site-footer';
 import { HeaderDropdown } from '@/components/layout/header-dropdown';
 
 export default function ContactPage() {
@@ -21,20 +19,8 @@ export default function ContactPage() {
 
           {/* Header Section */}
           <header className="flex items-center justify-between w-full pb-4">
-            <Link
-              href="/"
-              className="group flex items-center gap-2 p-2 -ml-2 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
-              aria-label="Back to dashboard"
-            >
-              <ChevronLeft className="w-5 h-5 text-foreground transition-transform group-hover:-translate-x-1" />
-              <span className="font-heading font-medium text-foreground">Back</span>
-            </Link>
-            <div className="flex items-center gap-2">
-              <div className="scale-75 origin-right">
-                <AnimatedLogo />
-              </div>
-              <HeaderDropdown />
-            </div>
+            <AnimatedLogo />
+            <HeaderDropdown />
           </header>
 
           <div className="text-center md:text-left">
@@ -82,8 +68,6 @@ export default function ContactPage() {
 
         </div>
       </motion.main>
-
-      <SiteFooter />
     </div>
   );
 }

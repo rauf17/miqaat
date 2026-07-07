@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { LogoMark } from '@/components/brand/logo-mark';
@@ -7,21 +5,15 @@ import { LogoMark } from '@/components/brand/logo-mark';
 /**
  * Footer for the Miqaat app shell.
  *
- * The primary navigation dock used to live here, but was lifted into
- * `FloatingNav` (mounted once in the root layout) so it could be
- * `position: fixed` to the viewport and persist across route changes
- * for a smooth active-indicator animation.
+ * Mounted once in the root `app/layout.tsx` (next to `FloatingNav`) so
+ * it renders automatically on every route — pages no longer opt in.
  *
- * This footer now hosts the *demoted* navigation links — destinations
- * that are too low-frequency to earn bottom-dock real estate but still
- * need a sensible home. Per the IA audit:
+ * Hosts the *demoted* navigation links — destinations that are too
+ * low-frequency to earn bottom-dock real estate but still need a
+ * sensible home. Per the IA audit:
  *   - About   → /welcome  (one-time marketing/landing page)
  *   - Contact → /contact  (very-low-frequency support contact)
  *   - Source  → GitHub     (external link, visually marked as such)
- *
- * Note: with the P1-6 fix (lift SiteFooter into the root layout), this
- * component will render automatically on every page. For now, pages
- * that include it explicitly still work correctly.
  */
 export function SiteFooter() {
   return (
