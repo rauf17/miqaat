@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { LogoMark } from '@/components/brand/logo-mark';
+import { SITE } from '@/lib/site';
 
 /**
  * Footer for the Miqaat app shell.
@@ -34,7 +35,7 @@ export function SiteFooter() {
             Contact
           </Link>
           <a
-            href="https://github.com/rauf17/miqaat"
+            href={SITE.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="View Miqaat source code on GitHub (opens in a new tab)"

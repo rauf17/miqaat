@@ -24,14 +24,24 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://miqaat-beta.vercel.app"),
-  title: "Miqaat - Islamic Daily Companion",
+  // PSP-018: previously pointed to miqaat-beta.vercel.app which is a
+  // dead deployment (returns 404). All OG/Twitter card URLs resolved to
+  // a dead URL, breaking social shares. Now points to the live
+  // deployment via SITE.siteUrl (single source of truth).
+  metadataBase: new URL("https://miqaat-two.vercel.app"),
+  title: {
+    default: "Miqaat - Islamic Daily Companion",
+    template: "%s | Miqaat",
+  },
   description: "Your premium Islamic daily companion. Software that moves with the sky.",
   keywords: ["Islamic", "Prayer Times", "Hijri", "Adhan", "Qibla"],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Miqaat - Islamic Daily Companion",
     description: "Your premium Islamic daily companion. Software that moves with the sky.",
-    url: "https://miqaat-beta.vercel.app",
+    url: "https://miqaat-two.vercel.app",
     siteName: "Miqaat",
     locale: "en_US",
     type: "website",
@@ -80,6 +90,18 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col font-sans pb-32 sm:pb-40">
+        {/*
+          Skip-to-content link (audit A11Y-003, WCAG 2.4.1 Level A).
+          Visually hidden until focused, then appears top-left. Lets
+          keyboard users bypass the FloatingNav + per-page headers and
+          jump straight to page content.
+        */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[200] focus:px-4 focus:py-2 focus:bg-background focus:text-foreground focus:rounded-lg focus:shadow-lg focus:ring-2 focus:ring-primary focus:outline-none"
+        >
+          Skip to content
+        </a>
         <noscript>
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm p-6 text-center">
             <div className="max-w-md space-y-4 rounded-2xl border border-border bg-card p-6 shadow-lg">

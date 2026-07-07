@@ -11,9 +11,14 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#050B14',
     icons: [
       {
+        // /icon route (src/app/icon.tsx) actually serves image/png via
+        // Next.js ImageResponse, not SVG. Previously declared as
+        // image/svg+xml which could break PWA install validation
+        // (audit MKT-003).
         src: '/icon',
-        sizes: 'any',
-        type: 'image/svg+xml',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
       },
       {
         src: '/apple-icon',
