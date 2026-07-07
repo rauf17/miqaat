@@ -5,6 +5,7 @@ import { NightAtmosphere } from "@/components/ui/night-atmosphere";
 import { WeatherFetcher } from "@/components/weather/weather-fetcher";
 import { FloatingNav } from "@/components/layout/floating-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { RouteFocusManager } from "@/components/layout/route-focus-manager";
 import "./globals.css";
 
 const inter = Inter({
@@ -93,7 +94,16 @@ export default function RootLayout({
         <div className="relative z-10 flex-1 flex flex-col">
           <ThemeProvider>
             <WeatherFetcher />
-            {children}
+            {/*
+              RouteFocusManager moves focus to the page content wrapper
+              on every route change and announces the new page's <h1>
+              to assistive tech (audit P2-1). It wraps {children} so
+              every route inherits this behavior without per-page
+              opt-in.
+            */}
+            <RouteFocusManager>
+              {children}
+            </RouteFocusManager>
             {/*
               SiteFooter is mounted here (not per-page) so every route
               gets the demoted About / Contact / Source links without
