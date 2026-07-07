@@ -4,11 +4,11 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Code2, LayoutDashboard, Compass, Settings, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { useTimeOfDay } from '@/lib/theme/useTimeOfDay';
 import { useSettingsStore } from '@/lib/store/settingsStore';
+import { NAV_LINKS } from '@/components/layout/nav-links';
 
 /**
  * Persistent bottom navigation dock.
@@ -24,20 +24,17 @@ import { useSettingsStore } from '@/lib/store/settingsStore';
  *     When the nav was previously remounted per-page (inside SiteFooter),
  *     the layout animation could not run and the indicator snapped.
  *  3. Mounting it once in the root layout guarantees it is rendered on
- *     every single route (home, settings, qibla, weather, contact,
+ *     every single route (home, qibla, weather, settings, contact,
  *     welcome, etc.) without each page having to opt in.
+ *
+ * Nav content comes from `NAV_LINKS` in `./nav-links.ts`, which is also
+ * consumed by `HeaderDropdown`. This is the single source of truth —
+ * editing one file updates both nav surfaces.
  */
 export function FloatingNav() {
   const pathname = usePathname();
   const { timeOfDay } = useTimeOfDay();
   const reduceMotion = useSettingsStore((s) => s.reduceMotion);
-
-  const links = [
-    { href: '/', label: 'HOME', icon: LayoutDashboard },
-    { href: '/welcome', label: 'WELCOME', icon: Compass },
-    { href: '/settings', label: 'SETTINGS', icon: Settings },
-    { href: '/contact', label: 'CONTACT', icon: Mail },
-  ];
 
   const themeColors = {
     dawn: {
@@ -88,11 +85,14 @@ export function FloatingNav() {
         )}
       >
         <div className="flex items-center justify-between w-full min-w-[max-content] gap-2 sm:gap-4 px-2 relative z-10">
-          {links.map((link) => {
-            // Treat "/" specially so that sub-paths of "/" don't all light up.
-            const isActive =
-              link.href === '/' ? pathname === '/' : pathname === link.href;
+          {NAV_LINKS.map((link) => {
             const Icon = link.icon;
+            // Home is exact-match only; every other route also lights up
+            // for nested sub-routes (future-proofing — see audit P2-2).
+            const isActive =
+              link.href === '/'
+                ? pathname === '/'
+                : pathname === link.href || pathname.startsWith(link.href + '/');
             return (
               <Link
                 key={link.href}
@@ -161,20 +161,6 @@ export function FloatingNav() {
               </Link>
             );
           })}
-
-          <a
-            href="https://github.com/rauf17/miqaat"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative flex flex-col items-center justify-center w-20 sm:w-24 h-20 rounded-2xl transition-colors duration-300 text-muted-foreground/60 hover:text-muted-foreground"
-          >
-            <div className="relative z-10 flex flex-col items-center gap-2 mt-2">
-              <Code2 className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5]" />
-              <span className="text-[10px] sm:text-xs font-medium tracking-widest">
-                SOURCE
-              </span>
-            </div>
-          </a>
         </div>
       </nav>
     </div>

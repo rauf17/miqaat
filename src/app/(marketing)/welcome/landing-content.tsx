@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FaqSection } from '@/components/layout/faq-section';
-import { SiteFooter } from '@/components/layout/site-footer';
 import { HeaderDropdown } from '@/components/layout/header-dropdown';
 
 /* ─────────────────────── DATA ─────────────────────── */
@@ -399,7 +398,7 @@ export function LandingContent() {
       </section>
 
       {/* ───────── FOOTER ───────── */}
-      <SiteFooter />
+      {/* SiteFooter is mounted in the root layout — no need to render it here. */}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { NightAtmosphere } from "@/components/ui/night-atmosphere";
 import { WeatherFetcher } from "@/components/weather/weather-fetcher";
 import { FloatingNav } from "@/components/layout/floating-nav";
+import { SiteFooter } from "@/components/layout/site-footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -93,6 +94,12 @@ export default function RootLayout({
           <ThemeProvider>
             <WeatherFetcher />
             {children}
+            {/*
+              SiteFooter is mounted here (not per-page) so every route
+              gets the demoted About / Contact / Source links without
+              having to opt in. Same reasoning as FloatingNav below.
+            */}
+            <SiteFooter />
           </ThemeProvider>
         </div>
         {/*

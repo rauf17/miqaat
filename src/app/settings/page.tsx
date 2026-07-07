@@ -1,8 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { useSettingsStore } from '@/lib/store/settingsStore';
@@ -10,6 +8,7 @@ import { CALCULATION_METHODS, CalculationMethodId } from '@/lib/prayer/methods';
 import { LocationSetup } from '@/components/prayer/location-setup';
 import { NotificationSetup } from '@/components/prayer/notification-setup';
 import { AnimatedLogo } from '@/components/brand/animated-logo';
+import { HeaderDropdown } from '@/components/layout/header-dropdown';
 import { cn } from '@/lib/utils';
 
 export default function SettingsPage() {
@@ -26,17 +25,8 @@ export default function SettingsPage() {
         
         {/* Header Section */}
         <header className="flex items-center justify-between w-full pb-4">
-          <Link 
-            href="/"
-            className="group flex items-center gap-2 p-2 -ml-2 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
-            aria-label="Back to dashboard"
-          >
-            <ChevronLeft className="w-5 h-5 text-foreground transition-transform group-hover:-translate-x-1" />
-            <span className="font-heading font-medium text-foreground">Back</span>
-          </Link>
-          <div className="scale-75 origin-right">
-            <AnimatedLogo />
-          </div>
+          <AnimatedLogo />
+          <HeaderDropdown />
         </header>
 
         <div>
