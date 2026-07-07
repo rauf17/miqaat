@@ -13,7 +13,7 @@ import { AnimatedLogo } from '@/components/brand/animated-logo';
 import { cn } from '@/lib/utils';
 
 export default function SettingsPage() {
-  const { calculationMethod, setCalculationMethod, timeFormat, setTimeFormat } = useSettingsStore();
+  const { calculationMethod, setCalculationMethod, timeFormat, setTimeFormat, madhab, setMadhab, language, setLanguage, reduceMotion, setReduceMotion, largerText, setLargerText } = useSettingsStore();
 
   return (
     <motion.main 
@@ -147,6 +147,116 @@ export default function SettingsPage() {
                     </div>
                   );
                 })}
+              </div>
+            </section>
+
+            {/* Asr Calculation (Madhab) */}
+            <section>
+              <h3 className="text-xs font-bold tracking-widest text-primary uppercase mb-3">Asr Calculation (Madhab)</h3>
+              <div 
+                className="relative flex p-1.5 rounded-2xl bg-muted/40 backdrop-blur-md border border-border/50 shadow-sm" 
+                role="radiogroup" 
+                aria-label="Asr calculation method"
+              >
+                {(['shafi', 'hanafi'] as const).map((m) => (
+                  <button
+                    key={m}
+                    role="radio"
+                    aria-checked={madhab === m}
+                    onClick={() => setMadhab(m)}
+                    className={cn(
+                      "relative flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary z-10 capitalize",
+                      madhab === m 
+                        ? "text-primary-foreground" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {madhab === m && (
+                      <motion.div
+                        layoutId="madhabIndicator"
+                        className="absolute inset-0 bg-primary rounded-xl -z-10 shadow-sm"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    {m}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Hanafi Asr begins when shadow length is twice the object&apos;s length. Shafi/Standard begins at single length.
+              </p>
+            </section>
+
+            {/* Language Selection */}
+            <section>
+              <h3 className="text-xs font-bold tracking-widest text-primary uppercase mb-3">Language (Scaffold)</h3>
+              <div className="rounded-3xl border border-border/50 bg-card/50 backdrop-blur-md p-5 shadow-sm space-y-4">
+                <select 
+                  className="w-full bg-background border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  aria-label="Select language"
+                >
+                  <option value="en">English</option>
+                  <option value="ar" disabled>Arabic (Coming Soon)</option>
+                  <option value="ur" disabled>Urdu (Coming Soon)</option>
+                </select>
+              </div>
+            </section>
+
+            {/* Accessibility */}
+            <section>
+              <h3 className="text-xs font-bold tracking-widest text-primary uppercase mb-3">Accessibility</h3>
+              <div className="rounded-3xl border border-border/50 bg-card/50 backdrop-blur-md p-5 shadow-sm flex flex-col gap-4">
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Reduce Motion</h4>
+                    <p className="text-sm text-muted-foreground">Minimize decorative animations.</p>
+                  </div>
+                  <button
+                    role="switch"
+                    aria-checked={reduceMotion}
+                    onClick={() => setReduceMotion(!reduceMotion)}
+                    className={cn(
+                      "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                      reduceMotion ? "bg-primary" : "bg-muted"
+                    )}
+                  >
+                    <span className="sr-only">Reduce Motion</span>
+                    <span
+                      className={cn(
+                        "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                        reduceMotion ? "translate-x-6" : "translate-x-1"
+                      )}
+                    />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Larger Text</h4>
+                    <p className="text-sm text-muted-foreground">Increase base font size.</p>
+                  </div>
+                  <button
+                    role="switch"
+                    aria-checked={largerText}
+                    onClick={() => setLargerText(!largerText)}
+                    className={cn(
+                      "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                      largerText ? "bg-primary" : "bg-muted"
+                    )}
+                  >
+                    <span className="sr-only">Larger Text</span>
+                    <span
+                      className={cn(
+                        "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                        largerText ? "translate-x-6" : "translate-x-1"
+                      )}
+                    />
+                  </button>
+                </div>
+
               </div>
             </section>
           </div>

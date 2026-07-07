@@ -78,7 +78,7 @@ export function deriveCurrentPrayer(
 
 export function useCurrentPrayer() {
   const { lat, lng } = useLocationStore();
-  const { calculationMethod } = useSettingsStore();
+  const { calculationMethod, madhab } = useSettingsStore();
 
   const [state, setState] = useState<CurrentPrayerState | null>(null);
 
@@ -95,6 +95,7 @@ export function useCurrentPrayer() {
         lng: lng!,
         date: addDays(todayDate, -1),
         method: calculationMethod,
+        madhab,
       });
 
       const today = calculatePrayerTimes({
@@ -102,6 +103,7 @@ export function useCurrentPrayer() {
         lng: lng!,
         date: todayDate,
         method: calculationMethod,
+        madhab,
       });
 
       const tomorrow = calculatePrayerTimes({
@@ -109,6 +111,7 @@ export function useCurrentPrayer() {
         lng: lng!,
         date: addDays(todayDate, 1),
         method: calculationMethod,
+        madhab,
       });
 
       setState(deriveCurrentPrayer(now, yesterday, today, tomorrow));
@@ -117,7 +120,7 @@ export function useCurrentPrayer() {
     update();
     const intervalId = setInterval(update, 60000); // Check every minute
     return () => clearInterval(intervalId);
-  }, [lat, lng, calculationMethod]);
+  }, [lat, lng, calculationMethod, madhab]);
 
   return state;
 }

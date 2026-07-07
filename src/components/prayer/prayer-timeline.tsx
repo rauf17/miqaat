@@ -26,7 +26,7 @@ const PRAYER_DISPLAY_NAMES: Record<PrayerName, string> = {
 
 export function PrayerTimeline() {
   const { lat, lng } = useLocationStore();
-  const { calculationMethod, timeFormat } = useSettingsStore();
+  const { calculationMethod, timeFormat, madhab } = useSettingsStore();
   const currentPrayerState = useCurrentPrayer();
   const [expandedNode, setExpandedNode] = React.useState<PrayerName | null>(null);
 
@@ -60,8 +60,9 @@ export function PrayerTimeline() {
       lng,
       date: timelineDate,
       method: calculationMethod,
+      madhab,
     });
-  }, [lat, lng, calculationMethod, timelineDate]);
+  }, [lat, lng, calculationMethod, madhab, timelineDate]);
 
   const is24h = timeFormat === '24h';
   const isLoading = !timelineTimes || !currentPrayerState;

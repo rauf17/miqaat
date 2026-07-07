@@ -4,7 +4,7 @@ import { useLocationStore } from '@/lib/store/locationStore';
 import { calculatePrayerTimes } from './calculate';
 
 export function useNotificationScheduler() {
-  const { notificationsEnabled, notificationOffset, calculationMethod } = useSettingsStore();
+  const { notificationsEnabled, notificationOffset, calculationMethod, madhab } = useSettingsStore();
   const { lat, lng } = useLocationStore();
   const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
 
@@ -32,7 +32,7 @@ export function useNotificationScheduler() {
     }
 
     const scheduleForDate = (date: Date) => {
-      const times = calculatePrayerTimes({ lat, lng, date, method: calculationMethod });
+      const times = calculatePrayerTimes({ lat, lng, date, method: calculationMethod, madhab });
       const now = new Date();
 
       const prayers = [
@@ -76,5 +76,5 @@ export function useNotificationScheduler() {
     scheduleForDate(tomorrow);
 
     return clearTimeouts;
-  }, [notificationsEnabled, notificationOffset, calculationMethod, lat, lng]);
+  }, [notificationsEnabled, notificationOffset, calculationMethod, madhab, lat, lng]);
 }
