@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useRef } from 'react';
 import { useTimeOfDay } from '@/lib/theme/useTimeOfDay';
-import { useSettingsStore } from '@/lib/store/settingsStore';
+import { useReduceMotion } from '@/lib/theme/use-reduce-motion';
 import { cn } from '@/lib/utils';
 import { motion, useMotionValue, useTransform, useAnimationFrame, PanInfo } from 'framer-motion';
 
@@ -55,7 +55,7 @@ function useCelestialProgress() {
 export function CelestialArc() {
   const { timeOfDay } = useTimeOfDay();
   const progress = useCelestialProgress();
-  const { reduceMotion } = useSettingsStore();
+  const reduceMotion = useReduceMotion();
 
   const isNight = timeOfDay === 'night';
   
@@ -185,7 +185,7 @@ export function CelestialArc() {
             </div>
           ) : (
             // BRILLIANT 3D SUN
-            <div className="relative w-full h-full flex items-center justify-center mix-blend-screen pointer-events-none">
+            <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
               {/* Intense outer corona */}
               <div 
                 className="absolute inset-[-60%] rounded-full opacity-60"

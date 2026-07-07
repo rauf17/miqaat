@@ -10,7 +10,7 @@ export function NightAtmosphere({ className, ...props }: NightAtmosphereProps) {
     <svg
       viewBox="0 0 100 100"
       preserveAspectRatio="xMidYMid slice"
-      className={cn('absolute inset-0 h-full w-full pointer-events-none opacity-0 transition-opacity duration-[60s] ease-in-out', className)}
+      className={cn('absolute inset-0 h-full w-full pointer-events-none opacity-0 transition-opacity duration-1000 ease-in-out', className)}
       data-night-atmosphere
       xmlns="http://www.w3.org/2000/svg"
       {...props}

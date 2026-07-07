@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { rateLimit, getClientIp, safeParseJson } from '@/lib/api-utils';
 
 function isValidReflection(output: string): boolean {
   if (!output || typeof output !== 'string' || output.trim().length < 10) return false;
@@ -100,32 +101,63 @@ export async function POST(request: Request) {
   try {
     const geminiKey = process.env.GEMINI_API_KEY;
     const groqKey = process.env.GROQ_API_KEY;
-    
+
     if (!geminiKey) {
       return NextResponse.json({ error: 'Gemini API key is not configured.' }, { status: 500 });
     }
 
-    const body = await request.json();
-    const { dateStr, contentText, context } = body;
+    // P-H-016: rate limit (10 req/IP/hour — LLM calls are expensive)
+    const ip = getClientIp(request);
+    if (!rateLimit(ip, 10, 1 / 360)) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
+    // P-H-016: body-size cap (4KB max — legitimate requests are < 1KB)
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && parseInt(contentLength, 10) > 4096) {
+      return NextResponse.json({ error: 'Request body too large' }, { status: 413 });
+    }
+
+    // P-H-043: safe JSON parse (returns 400 on malformed, not 500)
+    const body = await safeParseJson(request);
+    if (body === null) {
+      return NextResponse.json({ error: 'Malformed JSON body' }, { status: 400 });
+    }
+    const { dateStr, contentText, context } = body as {
+      dateStr?: string;
+      contentText?: string;
+      context?: { timeOfDay?: string; isFriday?: unknown; isRamadan?: unknown; weatherCondition?: string };
+    };
 
     if (!dateStr || !contentText) {
       return NextResponse.json({ error: 'dateStr and contentText are required.' }, { status: 400 });
     }
 
+    // P-H-041: validate context shape (whitelist allowed values)
+    const VALID_TIME_OF_DAY = ['dawn', 'day', 'golden', 'night'] as const;
+    const validTimeOfDay =
+      context?.timeOfDay && (VALID_TIME_OF_DAY as readonly string[]).includes(context.timeOfDay)
+        ? context.timeOfDay
+        : undefined;
+    const validIsFriday = context?.isFriday === true;
+    const validIsRamadan = context?.isRamadan === true;
+    const validWeather =
+      typeof context?.weatherCondition === 'string' && context.weatherCondition.length <= 32
+        ? context.weatherCondition
+        : undefined;
+
     let contextualInstruction = "Keep it contemplative and rooted in daily life.";
     if (context) {
-      const { timeOfDay, isFriday, isRamadan, weatherCondition } = context;
-      
       const parts = [];
-      if (isFriday) parts.push("a Friday (Jumu'ah) tone, emphasizing community, blessings, or spiritual reset");
-      if (isRamadan) parts.push("a Ramadan awareness, focusing on fasting, patience, or the Quran");
-      
-      if (timeOfDay === 'dawn' || timeOfDay === 'day') parts.push("a morning/daytime feel (fresh starts, seeking provision, energy)");
-      else if (timeOfDay === 'golden') parts.push("a sunset/Maghrib tone (gratitude, winding down, transition)");
-      else if (timeOfDay === 'night') parts.push("a nighttime tone (tranquility, seeking forgiveness, rest)");
-      
-      if (weatherCondition === 'Rain') parts.push("a subtle rain theme (mercy, growth, washing away)");
-      else if (weatherCondition === 'Clear') parts.push("a clear weather theme (clarity, brightness, light)");
+      if (validIsFriday) parts.push("a Friday (Jumu'ah) tone, emphasizing community, blessings, or spiritual reset");
+      if (validIsRamadan) parts.push("a Ramadan awareness, focusing on fasting, patience, or the Quran");
+
+      if (validTimeOfDay === 'dawn' || validTimeOfDay === 'day') parts.push("a morning/daytime feel (fresh starts, seeking provision, energy)");
+      else if (validTimeOfDay === 'golden') parts.push("a sunset/Maghrib tone (gratitude, winding down, transition)");
+      else if (validTimeOfDay === 'night') parts.push("a nighttime tone (tranquility, seeking forgiveness, rest)");
+
+      if (validWeather === 'Rain') parts.push("a subtle rain theme (mercy, growth, washing away)");
+      else if (validWeather === 'Clear') parts.push("a clear weather theme (clarity, brightness, light)");
 
       if (parts.length > 0) {
         contextualInstruction = "Infuse the reflection subtly with " + parts.join(", ") + ". Do NOT mention these contexts explicitly as variables, just naturally weave their themes in.";

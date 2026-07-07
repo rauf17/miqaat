@@ -23,7 +23,7 @@ const FEATURES = [
     icon: Clock,
     title: 'Living Prayer Timeline',
     description:
-      'Six prayer times calculated from the sun\u2019s true position at your coordinates. A glowing marker follows you through the day \u2014 past prayers dim, the current one pulses, and the next countdown ticks in real time.',
+      'Five daily prayers plus sunrise, calculated from the sun\u2019s true position at your coordinates. A glowing marker follows you through the day \u2014 past prayers dim, the current one pulses, and the next countdown ticks in real time.',
     screenshot: '/marketing/timeline.webp',
   },
   {
@@ -44,7 +44,7 @@ const FEATURES = [
     icon: BookOpen,
     title: 'Daily Reflection',
     description:
-      'Each day surfaces a verified Quranic verse or Sahih Hadith from a curated dataset of 100 entries \u2014 never AI\u2011generated scripture. An optional AI reflection adds a warm, personal thought without inventing or paraphrasing sacred text.',
+      'Each day surfaces a verified Quranic verse or Sahih Hadith from a curated dataset of 86 entries \u2014 never AI\u2011generated scripture. An optional AI reflection adds a warm, personal thought without inventing or paraphrasing sacred text.',
     screenshot: '/marketing/reflection.webp',
   },
 ];

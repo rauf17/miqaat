@@ -48,7 +48,7 @@ export function AnimatedLogo({ className, animateIn = false }: AnimatedLogoProps
         className="w-10 h-10 shrink-0" 
         animateIn={animateIn} 
         isHovered={isHovered} 
-        reducedMotion={prefersReducedMotion!} 
+        reducedMotion={prefersReducedMotion ?? false}
       />
       
       <motion.span 
@@ -75,7 +75,7 @@ export function AnimatedLogo({ className, animateIn = false }: AnimatedLogoProps
             <div className="flex flex-col gap-1.5">
               <div className="flex items-end justify-between">
                 <span className="font-heading font-semibold text-primary tracking-wide">Miqaat</span>
-                <span className="font-arabic text-xl text-foreground" dir="rtl">مِيقَات</span>
+                <span className="font-arabic text-xl text-foreground" dir="rtl" lang="ar">مِيقَات</span>
               </div>
               <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium border-b border-border/50 pb-2 mb-1">
                 /miːˈqɑːt/
