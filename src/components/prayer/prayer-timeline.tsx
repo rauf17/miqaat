@@ -7,7 +7,6 @@ import { useCurrentPrayer, PRAYER_SEQUENCE, PrayerName } from '@/lib/prayer/useC
 import { useLocationStore } from '@/lib/store/locationStore';
 import { useSettingsStore } from '@/lib/store/settingsStore';
 import { calculatePrayerTimes } from '@/lib/prayer/calculate';
-import { LiveCountdown } from './live-countdown';
 import { themeTransitionPreset } from '@/lib/theme/motion';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -163,7 +162,7 @@ export function PrayerTimeline() {
               {/* Countdown & Expansion */}
               {!isLoading && (
                 <AnimatePresence>
-                  {((currentPrayerState.next.name === prayerName) || expandedNode === prayerName) && (
+                  {(expandedNode === prayerName) && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
@@ -173,16 +172,7 @@ export function PrayerTimeline() {
                     >
                       <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground bg-muted/40 rounded-xl p-2.5 border border-border/50">
                         <Clock className="w-5 h-5 text-primary shrink-0" />
-                        {currentPrayerState.next.name === prayerName ? (
-                          <div className="flex flex-col">
-                            <span className="font-medium text-foreground text-xs uppercase tracking-wider mb-1">Next Prayer</span>
-                            <div className="text-lg font-mono tracking-tight text-primary">
-                              <LiveCountdown targetTime={currentPrayerState.next.time} />
-                            </div>
-                          </div>
-                        ) : (
-                          <span>{format(time!, is24h ? 'HH:mm:ss' : 'hh:mm:ss a')}</span>
-                        )}
+                        <span>{format(time!, is24h ? 'HH:mm:ss' : 'hh:mm:ss a')}</span>
                       </div>
                     </motion.div>
                   )}
