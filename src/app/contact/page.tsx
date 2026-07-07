@@ -11,17 +11,17 @@ import { HeaderDropdown } from '@/components/layout/header-dropdown';
 export default function ContactPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <motion.main 
+      <motion.main
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="flex-1 flex flex-col items-center justify-start p-4 pt-6 md:p-12 relative z-10"
       >
         <div className="w-full max-w-2xl mx-auto space-y-12">
-          
+
           {/* Header Section */}
           <header className="flex items-center justify-between w-full pb-4">
-            <Link 
+            <Link
               href="/"
               className="group flex items-center gap-2 p-2 -ml-2 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Back to dashboard"
@@ -46,8 +46,8 @@ export default function ContactPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
             {/* Email */}
-            <a 
-              href="mailto:hello@miqaat.app"
+            <a
+              href="mailto:connect2rauf17@gmail.com"
               className="group relative flex flex-col p-8 rounded-3xl border border-border/50 bg-card/40 backdrop-blur-md hover:border-primary/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -57,12 +57,12 @@ export default function ContactPage() {
               <h3 className="text-xl font-heading font-bold mb-2">Email</h3>
               <p className="text-muted-foreground mb-4">Send us a direct message for support or general inquiries.</p>
               <span className="mt-auto text-primary font-medium flex items-center gap-1 group-hover:underline">
-                hello@miqaat.app
+                connect2rauf17@gmail.com
               </span>
             </a>
 
             {/* GitHub */}
-            <a 
+            <a
               href="https://github.com/rauf17/miqaat"
               target="_blank"
               rel="noopener noreferrer"
@@ -82,7 +82,7 @@ export default function ContactPage() {
 
         </div>
       </motion.main>
-      
+
       <SiteFooter />
     </div>
   );

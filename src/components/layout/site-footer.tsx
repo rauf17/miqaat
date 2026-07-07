@@ -2,10 +2,22 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { LogoMark } from '@/components/brand/logo-mark';
 import { Code2 } from 'lucide-react';
+import { StreetLamp } from '@/components/ui/street-lamp';
+import { cn } from '@/lib/utils';
 
 export function SiteFooter() {
+  const pathname = usePathname();
+
+  const links = [
+    { href: '/', label: 'Dashboard' },
+    { href: '/welcome', label: 'Welcome' },
+    { href: '/settings', label: 'Settings' },
+    { href: '/contact', label: 'Contact' },
+  ];
+
   return (
     <footer className="relative py-12 md:py-16 px-6 border-t border-border/30 w-full mt-12">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
@@ -21,19 +33,23 @@ export function SiteFooter() {
           </p>
         </div>
 
-        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-muted-foreground font-medium">
-          <Link href="/" className="hover:text-foreground transition-colors">
-            Dashboard
-          </Link>
-          <Link href="/welcome" className="hover:text-foreground transition-colors">
-            Welcome
-          </Link>
-          <Link href="/settings" className="hover:text-foreground transition-colors">
-            Settings
-          </Link>
-          <Link href="/contact" className="hover:text-foreground transition-colors">
-            Contact
-          </Link>
+        <nav className="flex flex-wrap items-center justify-center gap-x-2 gap-y-3 text-sm font-medium">
+          {links.map(link => {
+            const isActive = pathname === link.href;
+            return (
+              <Link 
+                key={link.href} 
+                href={link.href} 
+                className={cn(
+                  "relative flex flex-col items-center justify-center px-4 py-2 transition-colors hover:text-foreground",
+                  isActive ? "text-foreground" : "text-muted-foreground"
+                )}
+              >
+                {isActive && <StreetLamp className="absolute -top-3" />}
+                <span className="relative z-10">{link.label}</span>
+              </Link>
+            );
+          })}
           <a
             href="https://github.com/rauf17/miqaat"
             target="_blank"
