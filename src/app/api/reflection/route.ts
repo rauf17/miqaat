@@ -80,10 +80,30 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { dateStr, contentText } = body;
+    const { dateStr, contentText, context } = body;
 
     if (!dateStr || !contentText) {
       return NextResponse.json({ error: 'dateStr and contentText are required.' }, { status: 400 });
+    }
+
+    let contextualInstruction = "Keep it contemplative and rooted in daily life.";
+    if (context) {
+      const { timeOfDay, isFriday, isRamadan, weatherCondition } = context;
+      
+      const parts = [];
+      if (isFriday) parts.push("a Friday (Jumu'ah) tone, emphasizing community, blessings, or spiritual reset");
+      if (isRamadan) parts.push("a Ramadan awareness, focusing on fasting, patience, or the Quran");
+      
+      if (timeOfDay === 'dawn' || timeOfDay === 'day') parts.push("a morning/daytime feel (fresh starts, seeking provision, energy)");
+      else if (timeOfDay === 'golden') parts.push("a sunset/Maghrib tone (gratitude, winding down, transition)");
+      else if (timeOfDay === 'night') parts.push("a nighttime tone (tranquility, seeking forgiveness, rest)");
+      
+      if (weatherCondition === 'Rain') parts.push("a subtle rain theme (mercy, growth, washing away)");
+      else if (weatherCondition === 'Clear') parts.push("a clear weather theme (clarity, brightness, light)");
+
+      if (parts.length > 0) {
+        contextualInstruction = "Infuse the reflection subtly with " + parts.join(", ") + ". Do NOT mention these contexts explicitly as variables, just naturally weave their themes in.";
+      }
     }
 
     const prompt = `Write a short (2-4 sentence), warm, non-preachy daily reflection for a Muslim user.
@@ -96,7 +116,7 @@ CRITICAL RULES:
 1. You MUST NOT invent, generate, or paraphrase any Quranic verses or Hadiths yourself.
 2. You MUST NOT include any citations (e.g., "Quran 2:10", "Bukhari", etc.) in your output.
 3. You are merely offering a brief, uplifting personal reflection on the provided text, without issuing religious rulings.
-4. Keep it contemplative and rooted in daily life.`;
+4. ${contextualInstruction}`;
 
     let finalOutput = '';
 

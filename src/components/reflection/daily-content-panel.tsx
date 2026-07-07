@@ -4,6 +4,10 @@ import * as React from 'react';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { generateCacheKey, getCachedReflection, setCachedReflection } from '@/lib/reflection/cache';
 import { getDailyContent } from '@/lib/content/daily-selector';
+import { getWeatherDescription } from '@/lib/weather/utils';
+import { toHijri } from '@/lib/hijri/convert';
+import { useTimeOfDay } from '@/lib/theme/useTimeOfDay';
+import { useWeatherStore } from '@/lib/store/weatherStore';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { BookOpen, Sparkles } from 'lucide-react';
@@ -13,55 +17,72 @@ export function DailyContentPanel() {
   const [reflection, setReflection] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   
+  const { timeOfDay } = useTimeOfDay();
+  const { data: weatherData } = useWeatherStore();
+  const weatherCondition = getWeatherDescription(weatherData?.current?.conditionCode);
+  
   const dateStr = format(new Date(), 'yyyy-MM-dd');
   const content = React.useMemo(() => getDailyContent(dateStr), [dateStr]);
   const activeText = content.showVerse 
     ? `Quran Surah ${content.verse.surah} ${content.verse.reference}:\n${content.verse.english}`
     : `${content.hadith.collection} Book ${content.hadith.book}, Hadith ${content.hadith.number}:\n${content.hadith.text}`;
 
-  const fetchReflection = React.useCallback(async () => {
-    if (lat === null || lng === null) return;
-    
-    setIsLoading(true);
-    const locationHash = `${lat.toFixed(2)},${lng.toFixed(2)}`;
-    const cacheKey = generateCacheKey(dateStr, locationHash);
-    
-    const cached = getCachedReflection(cacheKey);
-    if (cached) {
-      setReflection(cached.text);
-      setIsLoading(false);
-      return;
-    }
-    
-    try {
-      const res = await fetch('/api/reflection', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dateStr, contentText: activeText })
-      });
-      
-      if (!res.ok) throw new Error('Failed to fetch');
-      
-      const data = await res.json();
-      
-      if (data.text) {
-        setReflection(data.text);
-        setCachedReflection(cacheKey, { text: data.text, dateStr, locationHash });
-      } else {
-        throw new Error('Empty response');
-      }
-    } catch {
-      // Fallback is simply not showing a reflection if validation/network fails.
-      setReflection(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [lat, lng, dateStr, activeText]);
-
   React.useEffect(() => {
+    async function fetchReflection() {
+      if (lat === null || lng === null) return;
+      
+      setIsLoading(true);
+      const locationHash = `${lat.toFixed(2)},${lng.toFixed(2)}`;
+      const cacheKey = generateCacheKey(dateStr, locationHash);
+      
+      const cached = getCachedReflection(cacheKey);
+      if (cached) {
+        setReflection(cached.text);
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        const now = new Date();
+        const isFriday = now.getDay() === 5;
+        const isRamadan = toHijri(now).monthName.toLowerCase() === 'ramadan';
+
+        const res = await fetch('/api/reflection', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            dateStr, 
+            contentText: activeText,
+            context: {
+              timeOfDay,
+              isFriday,
+              isRamadan,
+              weatherCondition
+            }
+          })
+        });
+        
+        if (!res.ok) throw new Error('Failed to fetch');
+        
+        const data = await res.json();
+        
+        if (data.text) {
+          setReflection(data.text);
+          setCachedReflection(cacheKey, { text: data.text, dateStr, locationHash });
+        } else {
+          throw new Error('Empty response');
+        }
+      } catch {
+        // Fallback is simply not showing a reflection if validation/network fails.
+        setReflection(null);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchReflection();
-  }, [fetchReflection]);
+  }, [lat, lng, dateStr, activeText, timeOfDay, weatherCondition]);
 
   if (lat === null || lng === null) return null;
 
