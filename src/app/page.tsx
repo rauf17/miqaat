@@ -108,10 +108,10 @@ export default function Home() {
       <NotificationScheduler />
       <AmbientBackground />
       <main className={cn(
-        "flex min-h-screen flex-col items-center justify-start p-4 pt-4 md:p-6 relative z-10 transition-opacity duration-1000",
+        "flex min-h-screen flex-col items-center justify-start p-4 pt-4 md:p-6 relative z-10 transition-opacity duration-1000 pointer-events-none",
         !isMounted ? "opacity-0" : "opacity-100"
       )}>
-        <div className="w-full max-w-md mx-auto space-y-8">
+        <div className="w-full max-w-md mx-auto space-y-8 pointer-events-auto">
         
         {/* Header Section */}
         <header className="flex flex-col w-full pb-2 relative z-50">
@@ -234,9 +234,10 @@ export default function Home() {
           </div>
         )}
       </div>
-
-      <FaqSection id="faq" />
-      <SiteFooter />
+      <div className="w-full pointer-events-auto">
+        <FaqSection id="faq" />
+        <SiteFooter />
+      </div>
     </main>
     </>
   );
