@@ -3,6 +3,7 @@ import { Inter, Lora, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NightAtmosphere } from "@/components/ui/night-atmosphere";
 import { WeatherFetcher } from "@/components/weather/weather-fetcher";
+import { FloatingNav } from "@/components/layout/floating-nav";
 import "./globals.css";
 
 const inter = Inter({
@@ -76,7 +77,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans pb-32 sm:pb-40">
         <noscript>
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm p-6 text-center">
             <div className="max-w-md space-y-4 rounded-2xl border border-border bg-card p-6 shadow-lg">
@@ -94,6 +95,18 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </div>
+        {/*
+          Persistent bottom navigation dock. Mounted once here (not per-page)
+          so that:
+            - it is `position: fixed` to the viewport (always visible),
+            - the same React instance survives route changes, which lets
+              framer-motion's `layoutId` smoothly slide the active
+              "spotlight" from one tab to the next,
+            - it renders on every route without each page having to opt in.
+          The `pb-32 sm:pb-40` on <body> above reserves space so the dock
+          never overlaps the bottom of long page content.
+        */}
+        <FloatingNav />
       </body>
     </html>
   );
