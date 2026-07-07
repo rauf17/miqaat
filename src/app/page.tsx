@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { LocationSetup } from '@/components/prayer/location-setup';
 import { PrayerTimeline } from '@/components/prayer/prayer-timeline';
 import dynamic from 'next/dynamic';
 
@@ -27,6 +26,7 @@ import { CalendarDays, Clock, Settings, Compass, CloudOff } from 'lucide-react';
 import Link from 'next/link';
 import { NotificationScheduler } from '@/components/prayer/notification-scheduler';
 import { LiveCountdown } from '@/components/prayer/live-countdown';
+import { OnboardingModal } from '@/components/prayer/onboarding-modal';
 
 const PRAYER_DISPLAY_NAMES: Record<PrayerName, string> = {
   fajr: 'Fajr',
@@ -109,34 +109,44 @@ export default function Home() {
         <div className="w-full max-w-md mx-auto space-y-8">
         
         {/* Header Section */}
-        <header className="flex items-center justify-between w-full pb-2">
-          <AnimatedLogo />
-          <div className="z-50 flex items-center gap-2">
-            <Link 
-              href="/qibla"
-              className="inline-flex p-2.5 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
-              aria-label="Open Qibla compass"
-            >
-              <Compass className="w-6 h-6 text-foreground" />
-            </Link>
-            <Link 
-              href="/settings"
-              className="inline-flex p-2.5 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
-              aria-label="Open settings"
-            >
-              <Settings className="w-6 h-6 text-foreground" />
-            </Link>
+        <header className="flex flex-col w-full pb-2 relative z-50">
+          <div className="flex items-center justify-between w-full">
+            <AnimatedLogo />
+            <div className="flex items-center gap-2">
+              <Link 
+                href="/qibla"
+                className="inline-flex p-2.5 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                aria-label="Open Qibla compass"
+              >
+                <Compass className="w-6 h-6 text-foreground" />
+              </Link>
+              <Link 
+                href="/settings"
+                className="inline-flex p-2.5 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                aria-label="Open settings"
+              >
+                <Settings className="w-6 h-6 text-foreground" />
+              </Link>
+            </div>
+          </div>
+          <div className="pl-[3.25rem] -mt-1">
+            <p className="text-[11px] font-sans font-medium text-muted-foreground/60 uppercase tracking-widest">
+              Software that moves with the sky
+            </p>
           </div>
         </header>
 
         {/* Unified Today Flow */}
+        <OnboardingModal />
         {!hasLocation ? (
-          <div className="bg-card p-8 rounded-3xl border border-border shadow-lg mt-8">
-            <h2 className="text-2xl font-heading font-semibold mb-4 text-center">Set your location</h2>
-            <p className="text-muted-foreground font-sans text-sm text-center mb-8">
-              We need to know where you are to calculate accurate prayer times based on the sun&apos;s position.
+          <div className="flex flex-col items-center text-center space-y-4 pt-12">
+            <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground leading-tight tracking-tight">
+               {greeting},<br />
+               <span className="text-foreground/80">Traveler</span>
+            </h1>
+            <p className="text-muted-foreground font-sans text-sm text-center max-w-sm">
+              Your location is needed to calculate prayer times. Please grant location access in the onboarding menu.
             </p>
-            <LocationSetup />
           </div>
         ) : (
           <div className="flex flex-col space-y-12">
