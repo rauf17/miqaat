@@ -19,7 +19,6 @@ import { AnimatedLogo } from '@/components/brand/animated-logo';
 import { useLocationStore } from '@/lib/store/locationStore';
 import { useWeatherStore } from '@/lib/store/weatherStore';
 import { useCurrentPrayer, PrayerName } from '@/lib/prayer/useCurrentPrayer';
-import { useTimeOfDay } from '@/lib/theme/useTimeOfDay';
 import { toHijri } from '@/lib/hijri/convert';
 import { format } from 'date-fns';
 import { getWeatherIcon } from '@/lib/weather/utils';
@@ -68,7 +67,6 @@ export default function Home() {
   const [isMounted, setIsMounted] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<'timeline' | 'calendar'>('timeline');
   const { lat, lng, city } = useLocationStore();
-  const { timeOfDay } = useTimeOfDay();
   const currentPrayerState = useCurrentPrayer();
   const hasLocation = lat !== null && lng !== null;
 

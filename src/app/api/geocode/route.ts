@@ -75,50 +75,66 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Missing coordinates or city' }, { status: 400 });
   }
 
-  if (!apiKey || apiKey === 'placeholder_geocoding_key' || apiKey.trim() === '') {
-    console.warn('GEOCODING_API_KEY is not configured or is a placeholder. Falling back to Unknown City.');
-    return NextResponse.json({
-      city: 'Unknown City',
-      country: 'Unknown Country',
-    });
-  }
+  if (apiKey && apiKey !== 'placeholder_geocoding_key' && apiKey.trim() !== '') {
+    try {
+      // Attempting to use Google Maps Geocoding API structure
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
 
-  try {
-    // Attempting to use Google Maps Geocoding API structure
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-    const response = await fetch(url);
-    const data = await response.json();
+      if (data.status === 'OK' && data.results && data.results.length > 0) {
+        const addressComponents = data.results[0].address_components;
+        
+        let resolvedCity = '';
+        let resolvedCountry = '';
 
-    if (data.status === 'OK' && data.results && data.results.length > 0) {
-      const addressComponents = data.results[0].address_components;
-      
-      let resolvedCity = '';
-      let resolvedCountry = '';
-
-      for (const component of addressComponents) {
-        if (component.types.includes('locality') || component.types.includes('postal_town')) {
-          resolvedCity = component.long_name;
+        for (const component of addressComponents) {
+          if (component.types.includes('locality') || component.types.includes('postal_town')) {
+            resolvedCity = component.long_name;
+          }
+          if (component.types.includes('country')) {
+            resolvedCountry = component.long_name;
+          }
         }
-        if (component.types.includes('country')) {
-          resolvedCountry = component.long_name;
+
+        // Fallback to top level admin area if city wasn't found
+        if (!resolvedCity) {
+          const adminArea = addressComponents.find((c: { types: string[] }) => c.types.includes('administrative_area_level_1'));
+          if (adminArea) resolvedCity = adminArea.long_name;
         }
+
+        return NextResponse.json({
+          city: resolvedCity || 'Unknown City',
+          country: resolvedCountry || 'Unknown Country',
+        });
       }
 
-      // Fallback to top level admin area if city wasn't found
-      if (!resolvedCity) {
-        const adminArea = addressComponents.find((c: { types: string[] }) => c.types.includes('administrative_area_level_1'));
-        if (adminArea) resolvedCity = adminArea.long_name;
-      }
-
-      return NextResponse.json({
-        city: resolvedCity || 'Unknown City',
-        country: resolvedCountry || 'Unknown Country',
-      });
+      throw new Error('No results from geocoding service');
+    } catch (error) {
+      console.error('Reverse geocoding failed:', error);
+      return NextResponse.json({ error: 'Failed to reverse geocode' }, { status: 500 });
     }
-
-    throw new Error('No results from geocoding service');
-  } catch (error) {
-    console.error('Reverse geocoding failed:', error);
-    return NextResponse.json({ error: 'Failed to reverse geocode' }, { status: 500 });
+  } else {
+    // Free Fallback: Nominatim (OpenStreetMap)
+    try {
+      const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=en`;
+      const response = await fetch(url, { headers: { 'User-Agent': 'MiqaatApp/1.0' } });
+      const data = await response.json();
+      
+      if (data && data.address) {
+        const city = data.address.city || data.address.town || data.address.village || data.address.county || 'Unknown City';
+        const country = data.address.country || 'Unknown Country';
+        
+        return NextResponse.json({
+          city: city,
+          country: country,
+        });
+      }
+      
+      throw new Error('No results from Nominatim reverse geocoding');
+    } catch (error) {
+      console.error('Nominatim reverse geocoding failed:', error);
+      return NextResponse.json({ error: 'Failed to reverse geocode' }, { status: 500 });
+    }
   }
 }
