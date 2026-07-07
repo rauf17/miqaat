@@ -27,6 +27,7 @@ import Link from 'next/link';
 import { NotificationScheduler } from '@/components/prayer/notification-scheduler';
 import { LiveCountdown } from '@/components/prayer/live-countdown';
 import { OnboardingModal } from '@/components/prayer/onboarding-modal';
+import { AmbientBackground } from '@/components/theme/ambient-background';
 
 const PRAYER_DISPLAY_NAMES: Record<PrayerName, string> = {
   fajr: 'Fajr',
@@ -102,6 +103,7 @@ export default function Home() {
     <>
       <SplashScreen show={!isMounted} />
       <NotificationScheduler />
+      <AmbientBackground />
       <main className={cn(
         "flex min-h-screen flex-col items-center justify-start p-4 pt-4 md:p-6 relative z-10 transition-opacity duration-1000",
         !isMounted ? "opacity-0" : "opacity-100"
