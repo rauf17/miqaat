@@ -2,24 +2,50 @@ import { NextResponse } from 'next/server';
 
 function isValidReflection(output: string): boolean {
   if (!output || typeof output !== 'string' || output.trim().length < 10) return false;
-  
+
   const words = output.trim().split(/\s+/);
   if (words.length < 15) return false; // Too short to be a 2-4 sentence reflection
 
   const sentences = output.split(/[.!?]+/).filter(s => s.trim().length > 0);
   if (sentences.length < 2) return false; // Needs at least 2 sentences
 
-  const forbiddenWords = ['surah', 'ayah', 'bukhari', 'muslim', 'tirmidhi', 'narrated', 'prophet said', 'allah says'];
+  // Block fabricated-citation indicators. NOTE: the bare word "muslim" was
+  // previously in this list, which silently rejected valid reflections
+  // containing phrases like "as Muslims, we" (the system prompt explicitly
+  // asks for "a daily reflection for a Muslim user"). Now we block only
+  // the citation-specific token "sahih muslim" (the hadith collection
+  // name), not the bare word. Same for "quran" — only block when it
+  // appears as a citation prefix like "quran:".
+  // See audit P-H-001.
+  const forbiddenWords = [
+    'surah',
+    'ayah',
+    'quran:',
+    'bukhari',
+    'sahih muslim',
+    'tirmidhi',
+    'abu dawud',
+    'narrated',
+    'prophet said',
+    'allah says',
+  ];
   const lowerOutput = output.toLowerCase();
-  
+
   if (forbiddenWords.some(word => lowerOutput.includes(word))) {
     return false;
   }
-  
-  if ((output.match(/"/g) || []).length >= 2) {
+
+  // Previously: rejected any reflection with >= 2 double-quote characters
+  // (i.e. a single quoted phrase). This was far too aggressive — LLMs
+  // naturally quote single words like the quality of "sabr" (patience),
+  // which is benign. Now: only reject when there are >= 4 double-quote
+  // characters (i.e. two separate quoted phrases), which suggests the
+  // model is quoting hadith/verse blocks.
+  // See audit P-H-002.
+  if ((output.match(/"/g) || []).length >= 4) {
     return false;
   }
-  
+
   return true;
 }
 

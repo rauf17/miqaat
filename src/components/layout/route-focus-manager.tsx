@@ -112,7 +112,7 @@ export function RouteFocusManager({ children }: { children: React.ReactNode }) {
         route change (keyboard users still get focus management
         benefits via the next Tab keypress).
       */}
-      <div ref={wrapperRef} tabIndex={-1} className="outline-none">
+      <div ref={wrapperRef} id="main-content" tabIndex={-1} className="outline-none">
         {children}
       </div>
     </>

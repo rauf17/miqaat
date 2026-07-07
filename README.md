@@ -63,7 +63,7 @@ To run Miqaat locally and experience the living sky on your own machine:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/rauf17/miqaat.git
+git clone https://github.com/ammarasad2005/miqaat.git
 
 # 2. Install dependencies
 cd miqaat

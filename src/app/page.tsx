@@ -79,12 +79,17 @@ export default function Home() {
     const tick = () => setDate(new Date());
     tick();
     const intervalId = setInterval(tick, 60000);
-    
-    const timer = setTimeout(() => setIsMounted(true), 800);
-    
+
+    // PSP-001: Previously forced an 800ms artificial delay before
+    // dismissing the splash and revealing content. This delayed LCP by
+    // ~1.2s on every navigation to "/". Now we mount immediately — the
+    // splash screen's own fade-out (400ms) provides the visual transition
+    // without blocking interaction.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+
     return () => {
       clearInterval(intervalId);
-      clearTimeout(timer);
     };
   }, []);
 

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Mail, Code2 } from 'lucide-react';
 import { AnimatedLogo } from '@/components/brand/animated-logo';
 import { HeaderDropdown } from '@/components/layout/header-dropdown';
+import { SITE } from '@/lib/site';
 
 export default function ContactPage() {
   return (
@@ -49,7 +50,7 @@ export default function ContactPage() {
 
             {/* GitHub */}
             <a
-              href="https://github.com/rauf17/miqaat"
+              href={SITE.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="group relative flex flex-col p-8 rounded-3xl border border-border/50 bg-card/40 backdrop-blur-md hover:border-primary/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden"
