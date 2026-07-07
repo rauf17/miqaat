@@ -1,74 +1,87 @@
-# Miqaat
+<div align="center">
+  
+  <img src="public/moon-texture.png" alt="Miqaat Logo" width="120" style="border-radius: 50%; box-shadow: 0 0 20px rgba(0,0,0,0.1); margin-bottom: 20px;" />
 
-Miqaat is a premium, privacy-first Islamic daily companion designed around a simple philosophy: **Software that moves with the sky.**
+  # 🌙 Miqaat (ميقَات)
+  **Software that moves with the sky.**
 
-Instead of static, utilitarian tables for prayer times, Miqaat uses a reactive, time-adaptive theme engine that continuously evolves throughout the day. It offers four distinct visual states (Dawn, Day, Golden, Night) that automatically shift based on the real-world time, creating a beautiful, ambient experience.
+  [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+  [![Framer Motion](https://img.shields.io/badge/Framer_Motion-black?style=for-the-badge&logo=framer)](https://www.framer.com/motion/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  
+  <p align="center">
+    A deeply atmospheric, premium Islamic dashboard designed to bring tranquility, mindfulness, and precise timings to your daily routine. 
+  </p>
+</div>
 
-![Miqaat Preview](public/preview.png)
+---
 
-## Core Features
+## 🌌 The Philosophy
 
-- **Living Theme Engine**: CSS variables driven by a time-adaptive React hook to shift colors, glows, and backgrounds.
-- **Solar Calculations**: Prayer times powered by `adhan.js` using strictly offline mathematical algorithms.
-- **Hijri Calendar**: Zero-dependency Hijri date conversions and month grid views using the native JavaScript `Intl` API (`islamic-umalqura`).
-- **Qibla Compass**: A precision bearing to the Kaaba calculated from your exact coordinates.
-- **Daily Reflection**: A curated rotation of authentic Quranic verses and Sahih Hadiths paired with safe, context-aware AI commentary.
-- **Weather Context**: Real-time ambient weather conditions subtly integrated into the interface.
-- **Complete Offline Privacy**: All settings and locations are saved entirely in your local browser storage using `zustand`. No login. No database.
+In a world filled with digital noise and endless notifications, **Miqaat** is designed to be a sanctuary on your screen. The word *Miqaat* (ميقَات) refers to an appointed time or place. We built this application on a core philosophy: **"Software that moves with the sky."** 
 
-## Tech Stack
+Unlike static applications, Miqaat is a living, breathing environment. As the sun rises, travels across the sky, and sets into the quiet of the night, Miqaat’s entire aesthetic—the lighting, the ambient particles, the colors—shifts in real-time to match the celestial reality outside your window. It is not just an app; it is a digital companion that tethers you to the natural rhythms of the universe and your daily spiritual commitments.
 
-- **Framework**: Next.js 14+ (App Router, Static Generation)
-- **Styling**: Tailwind CSS & Vanilla CSS Variables
-- **Components**: Radix / shadcn/ui
-- **State**: Zustand
-- **Animations**: Framer Motion
-- **Icons**: Lucide React
+## ✨ Signature Features
 
-## Local Setup
+### 🌖 The Celestial Engine
+Experience time visually. A photorealistic, 3D sun and moon actively track their true positions across a glowing arc on your screen. Built with custom CSS physics, you can physically interact with the celestial bodies—click and spin the fiery plasma of the sun or the textured craters of the moon with your mouse, and watch them smoothly carry momentum before settling back into their infinite, silent orbit. 
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/rauf17/miqaat.git
-   cd miqaat
-   ```
+### 🕌 Precision Prayer & Qibla
+Never miss a moment of connection.
+* **Prayer Tracking:** Highly accurate, location-based prayer timings (Fajr, Dhuhr, Asr, Maghrib, Isha) with an elegant, un-intrusive countdown to your next prayer.
+* **The Compass:** A beautiful, liquid-smooth Qibla compass that gracefully points you toward the Kaaba.
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### 📖 Daily Reflection
+Nourish your soul daily. We’ve meticulously curated a dataset of the most profoundly inspiring, universally regarded Hadiths and Quranic verses focusing on themes of patience, gratitude, mercy, and good character. A new reflection is seamlessly presented to you each day to set the tone for your morning.
 
-3. **Configure Environment Variables**
-   Copy `.env.example` to `.env.local`:
-   ```bash
-   cp .env.example .env.local
-   ```
-   Add the following variables to your `.env.local` file:
-   - `GEOCODING_API_KEY`: Used in `/api/geocode` to reverse geocode coordinates to city names (e.g., Google Maps API Key).
-   - `NEXT_PUBLIC_WEATHER_API_KEY`: Used to fetch weather conditions (e.g., WeatherAPI Key).
-   - `GEMINI_API_KEY`: Required for the Daily Reflection AI commentary feature.
+### 🌤️ Weather & Moon Phases
+Harmonize with your environment. Real-time local weather tracking and precise lunar phase calculations are elegantly integrated into the dashboard, ensuring you are always connected to the world around you.
 
-4. **Marketing Assets**
-   To fully populate the `/welcome` marketing page, ensure you place the following screenshots in `public/marketing/`:
-   - `timeline.webp`
-   - `calendar.webp`
-   - `qibla.webp`
-   - `reflection.webp`
+### 💎 Premium Aesthetics
+Every pixel is intentional.
+* **Ambient Backgrounds:** Drift through soft dawn clouds, bask in a golden hour glow, and stargaze through twinkling night particles.
+* **Spotlight Navigation:** A fluid, Framer Motion-powered dock that glows under your active tab like a soft streetlamp.
+* **Glassmorphism:** Restrained, frosted-glass cards that let the beauty of the sky shine through.
 
-5. **Run the development server**
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) for the dashboard, or [http://localhost:3000/welcome](http://localhost:3000/welcome) for the marketing page.
+---
 
-## Deployment
+## 🚀 Tech Stack
 
-Miqaat is optimized for Vercel and can be statically exported or deployed using the Edge runtime. 
+Miqaat is built at the intersection of modern web performance and fluid design:
+- **Framework:** Next.js (App Router)
+- **Styling:** Tailwind CSS + Radix UI Primitives
+- **Animation:** Framer Motion (Complex SVG Paths, Layout Animations, Physics-based Dragging)
+- **State Management:** Zustand (Global Time-of-Day Store)
+- **Calculations:** `adhan.js` for precise astronomical prayer math
+- **Icons:** Lucide React
 
-Simply connect your GitHub repository and add your `GEOCODING_API_KEY`, `NEXT_PUBLIC_WEATHER_API_KEY`, and `GEMINI_API_KEY` to the Vercel Environment Variables panel.
+## 🛠️ Getting Started
+
+To run Miqaat locally and experience the living sky on your own machine:
 
 ```bash
-npx vercel
-```
+# 1. Clone the repository
+git clone https://github.com/rauf17/miqaat.git
 
-**Live Demo**: [https://miqaat-beta.vercel.app/welcome](https://miqaat-beta.vercel.app/welcome)
+# 2. Install dependencies
+cd miqaat
+npm install
+
+# 3. Start the development server
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 🤝 Contributing
+
+We believe beautiful, spiritual tools should be built by the community. If you have an idea for a feature, an aesthetic improvement, or a translation, we welcome your pull requests. Let's build something beautiful together.
+
+## 📜 License
+This project is open-source and available under the [MIT License](LICENSE).
+
+---
+<div align="center">
+  <p><i>"Indeed, in the creation of the heavens and the earth and the alternation of the night and the day are signs for those of understanding." (Quran 3:190)</i></p>
+</div>
