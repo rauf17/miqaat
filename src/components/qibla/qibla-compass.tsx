@@ -91,12 +91,6 @@ export function QiblaCompass() {
   // If no heading (fallback), dial is 0 (North up).
   const dialRotation = heading !== null ? -heading : 0;
   
-  // The needle rotates independently on top of the dial.
-  // Its screen rotation is the physical Qibla bearing minus our current heading.
-  const needleRotation = qiblaBearing !== null && heading !== null 
-    ? qiblaBearing - heading 
-    : (qiblaBearing ?? 0);
-  
   // Calculate how close we are facing to Qibla (0 = perfectly facing, 180 = opposite)
   const isFacingQibla = heading !== null && qiblaBearing !== null 
     ? Math.abs((((heading - qiblaBearing + 180) % 360) + 360) % 360 - 180) < 5
@@ -144,16 +138,25 @@ export function QiblaCompass() {
           transition={{ duration: 0.8, ease: "easeOut" }}
         />
 
-        {/* The SVG Dial */}
-        <div className="relative w-72 h-72 rounded-full border border-border/30 bg-card/20 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.05)] flex items-center justify-center overflow-hidden z-10">
+        {/* The SVG Dial & Compass Housing */}
+        <div className="relative w-72 h-72 rounded-full border border-border/30 bg-card/20 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.05)] flex items-center justify-center z-10">
           
-          {/* Dial Layer */}
+          {/* Fixed Lubber Line (12 o'clock indicator) */}
+          <div className="absolute inset-0 z-20 pointer-events-none">
+            <svg viewBox="0 0 200 200" className="w-full h-full">
+              {/* Outer glowing border for the lubber line */}
+              <line x1="100" y1="0" x2="100" y2="15" stroke="currentColor" strokeWidth="4" className="text-primary opacity-80" strokeLinecap="round" />
+              <polygon points="95,15 105,15 100,25" className="fill-primary opacity-80" />
+            </svg>
+          </div>
+
+          {/* Rotating Dial Layer */}
           <motion.div 
             className="absolute inset-0 w-full h-full"
             animate={{ rotate: dialRotation }}
             transition={{ type: "spring", stiffness: 50, damping: 20, mass: 1 }}
           >
-            {/* Compass Marks */}
+            {/* Compass Marks & Fixed Kaaba Indicator */}
             <svg viewBox="0 0 200 200" className="w-full h-full text-foreground/40">
               <g className="font-heading text-[10px] font-semibold" fill="currentColor">
                 <text x="100" y="25" textAnchor="middle" alignmentBaseline="middle">N</text>
@@ -180,23 +183,16 @@ export function QiblaCompass() {
                   />
                 );
               })}
-            </svg>
-          </motion.div>
 
-          {/* Needle Layer */}
-          <motion.div 
-            className="absolute inset-0 w-full h-full"
-            initial={false}
-            animate={{ rotate: needleRotation }}
-            transition={{ type: "spring", stiffness: 40, damping: 15, mass: 1 }}
-          >
-            <svg viewBox="0 0 200 200" className="w-full h-full">
-              {/* Needle Base Line */}
-              <line x1="100" y1="100" x2="100" y2="40" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" className="text-primary/50" />
-              {/* Kaaba / Arrow Indicator */}
-              <polygon points="90,45 100,20 110,45 100,40" className="fill-primary" />
-              <circle cx="100" cy="100" r="4" className="fill-primary" />
-              <circle cx="100" cy="100" r="2" className="fill-background" />
+              {/* Kaaba Marker glued to the dial at qiblaBearing */}
+              {qiblaBearing !== null && (
+                <g transform={`rotate(${qiblaBearing} 100 100)`}>
+                  <line x1="100" y1="100" x2="100" y2="40" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" className="text-primary/40" />
+                  <polygon points="90,45 100,20 110,45 100,40" className="fill-primary" />
+                  <circle cx="100" cy="100" r="4" className="fill-primary" />
+                  <circle cx="100" cy="100" r="2" className="fill-background" />
+                </g>
+              )}
             </svg>
           </motion.div>
         </div>
