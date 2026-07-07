@@ -87,13 +87,18 @@ export function QiblaCompass() {
     return null; // Handled by parent
   }
 
-  // If we have heading, dial rotation is -heading so North is aligned to reality.
-  // If no heading (fallback), dial is 0 (North up).
-  const dialRotation = heading !== null ? -heading : 0;
+  // The user reported the rotation is inverted on device (diverging instead of converging).
+  // This means the device orientation sensor (or Framer Motion) is applying rotation 
+  // in the opposite direction to standard CSS clockwise rotation on this platform.
+  // To fix this, we negate the heading so it turns the opposite way.
+  const correctedHeading = heading !== null ? -heading : null;
+
+  // Dial rotation counter-rotates against the corrected heading
+  const dialRotation = correctedHeading !== null ? -correctedHeading : 0;
   
   // Calculate how close we are facing to Qibla (0 = perfectly facing, 180 = opposite)
-  const isFacingQibla = heading !== null && qiblaBearing !== null 
-    ? Math.abs((((heading - qiblaBearing + 180) % 360) + 360) % 360 - 180) < 5
+  const isFacingQibla = correctedHeading !== null && qiblaBearing !== null 
+    ? Math.abs((((correctedHeading - qiblaBearing + 180) % 360) + 360) % 360 - 180) < 5
     : false;
 
   return (
@@ -187,10 +192,11 @@ export function QiblaCompass() {
               {/* Kaaba Marker glued to the dial at qiblaBearing */}
               {qiblaBearing !== null && (
                 <g transform={`rotate(${qiblaBearing} 100 100)`}>
-                  <line x1="100" y1="100" x2="100" y2="40" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" className="text-primary/40" />
-                  <polygon points="90,45 100,20 110,45 100,40" className="fill-primary" />
-                  <circle cx="100" cy="100" r="4" className="fill-primary" />
-                  <circle cx="100" cy="100" r="2" className="fill-background" />
+                  <line x1="100" y1="100" x2="100" y2="35" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" className="text-primary/40" />
+                  {/* Kaaba Cube Icon */}
+                  <rect x="88" y="15" width="24" height="24" rx="2" className="fill-foreground" />
+                  {/* Gold band (Kiswah detail) */}
+                  <rect x="88" y="22" width="24" height="4" className="fill-primary" />
                 </g>
               )}
             </svg>
