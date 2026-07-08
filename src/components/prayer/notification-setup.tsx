@@ -85,7 +85,7 @@ export function NotificationSetup() {
         <div className="space-y-1.5 pr-4">
           <h4 className="font-medium text-foreground">Status</h4>
           <p className="text-sm text-muted-foreground leading-snug">
-            Receive a native browser alert before each prayer time.
+            Receive a native browser alert before each prayer time. Reminders fire while Miqaat is open in a foreground tab; install as a PWA for the most reliable experience.
           </p>
         </div>
         <button

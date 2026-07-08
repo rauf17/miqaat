@@ -6,6 +6,7 @@ import { WeatherFetcher } from "@/components/weather/weather-fetcher";
 import { FloatingNav } from "@/components/layout/floating-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { RouteFocusManager } from "@/components/layout/route-focus-manager";
+import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 import "./globals.css";
 
 const inter = Inter({
@@ -185,6 +186,11 @@ export default function RootLayout({
           never overlaps the bottom of long page content.
         */}
         <FloatingNav />
+        {/*
+          PSP-023: register the service worker for offline PWA support.
+          Renders null — just runs the registration effect.
+        */}
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
