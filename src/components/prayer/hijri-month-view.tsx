@@ -36,6 +36,14 @@ export function HijriMonthView() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedEvent]);
 
+  // P-H-018/019: memoize the grid per (year, month). Must be called
+  // unconditionally (before any early return) to satisfy rules-of-hooks.
+  const grid = React.useMemo(
+    () => (viewState ? getHijriMonthGrid(viewState.year, viewState.month) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: only re-run when year/month change, not on viewState object identity
+    [viewState?.year, viewState?.month]
+  );
+
   if (!currentDate || !viewState) {
     return <div className="h-96 w-full animate-pulse bg-card border border-border rounded-3xl" />;
   }
@@ -49,8 +57,6 @@ export function HijriMonthView() {
     setDirection(1);
     setViewState(getNextMonth(viewState.year, viewState.month));
   };
-
-  const grid = getHijriMonthGrid(viewState.year, viewState.month);
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -93,7 +99,22 @@ export function HijriMonthView() {
               transition={themeTransitionPreset}
               className="text-2xl md:text-3xl font-heading font-bold text-foreground"
             >
-              {viewState.month} {viewState.year}
+              {/* P-H-009: make the month-year title a button that snaps
+                  back to today's hijri month, so users can quickly return
+                  after navigating away. */}
+              <button
+                onClick={() => {
+                  if (!currentDate) return;
+                  const h = toHijri(currentDate);
+                  setViewState({ year: h.year, month: h.monthName });
+                  setDirection(0);
+                }}
+                className="hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg px-1"
+                aria-label={`Jump to current month. Currently viewing ${viewState.month} ${viewState.year}. Click to return to today.`}
+                title="Click to return to today"
+              >
+                {viewState.month} {viewState.year}
+              </button>
             </motion.h2>
           </AnimatePresence>
         </div>
@@ -141,23 +162,26 @@ export function HijriMonthView() {
                     const hasEvent = !day.isPadding && events.length > 0;
                     
                     return (
-                      <div 
-                        key={dIdx} 
+                      <div
+                        key={dIdx}
                         onClick={() => hasEvent && setSelectedEvent(events[0])}
                         role={hasEvent ? "button" : undefined}
                         tabIndex={hasEvent ? 0 : undefined}
                         aria-label={hasEvent ? `${events[0].name} on ${day.date.toDateString()}` : undefined}
+                        // A11Y-030: padding days are decorative context, hide from AT
+                        aria-hidden={day.isPadding ? true : undefined}
                         className={cn(
                           "group relative aspect-square flex flex-col items-center justify-center p-1 rounded-xl transition-all",
-                          day.isPadding ? "opacity-30" : "hover:bg-muted/50",
+                          // A11Y-030: raised padding opacity from 30 to 40 for better contrast
+                          day.isPadding ? "opacity-40" : "hover:bg-muted/50",
                           hasEvent && "cursor-pointer active:scale-95",
                           isToday && "ring-2 ring-primary bg-primary/10 shadow-[0_0_15px_var(--color-time-glow)]",
                           isFriday && !isToday && !day.isPadding && "bg-primary/5",
                           hasEvent && !isToday && "ring-1 ring-primary/40 bg-primary/5 hover:bg-primary/10"
                         )}
                       >
-                        {/* Gregorian Date */}
-                        <span className="absolute top-1 right-1.5 text-[9px] md:text-[10px] text-muted-foreground/60 font-sans">
+                        {/* Gregorian Date — A11Y-030: raised from /60 to full for contrast */}
+                        <span className="absolute top-1 right-1.5 text-[9px] md:text-[10px] text-muted-foreground font-sans">
                           {day.date.getDate()}
                         </span>
 

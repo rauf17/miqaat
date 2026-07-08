@@ -72,7 +72,7 @@ export function AmbientBackground() {
 
       {timeOfDay === 'night' && (
         <div className="absolute inset-0">
-          <svg className="absolute inset-0 w-[200vw] h-full ambient-drift-slow" viewBox="0 0 2000 1000" preserveAspectRatio="none">
+          <svg className="absolute inset-0 w-[200vw] h-full ambient-drift-slow" viewBox="0 0 2000 1000" preserveAspectRatio="xMidYMid slice">
             {/* First half (0 - 1000) */}
             <circle cx="100" cy="150" r="2" fill="#FFF" className="ambient-twinkle" />
             <circle cx="250" cy="300" r="1.5" fill="#FFF" className="ambient-twinkle-delay" />
@@ -88,7 +88,7 @@ export function AmbientBackground() {
             <circle cx="1850" cy="200" r="2" fill="#FFF" className="ambient-twinkle" />
           </svg>
           
-          <svg className="absolute inset-0 w-[200vw] h-full ambient-drift opacity-40" viewBox="0 0 2000 1000" preserveAspectRatio="none">
+          <svg className="absolute inset-0 w-[200vw] h-full ambient-drift opacity-40" viewBox="0 0 2000 1000" preserveAspectRatio="xMidYMid slice">
             {/* Particles - First half */}
             <circle cx="150" cy="600" r="1" fill="#FFF" />
             <circle cx="350" cy="800" r="1" fill="#FFF" />

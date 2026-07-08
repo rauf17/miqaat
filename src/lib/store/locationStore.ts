@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface LocationState {
   lat: number | null;
@@ -7,12 +7,24 @@ export interface LocationState {
   city: string | null;
   country: string | null;
   source: 'auto' | 'manual';
-  version: number;
   setLocation: (
     location: { lat: number; lng: number; city?: string; country?: string },
     source: 'auto' | 'manual'
   ) => void;
 }
+
+// SET-011: wrapped storage in createJSONStorage with try/catch so
+// Safari Private Browsing doesn't crash on every setLocation call.
+const safeStorage = createJSONStorage(() => {
+  try {
+    if (typeof window === 'undefined') {
+      return { getItem: () => null, setItem: () => {}, removeItem: () => {} };
+    }
+    return localStorage;
+  } catch {
+    return { getItem: () => null, setItem: () => {}, removeItem: () => {} };
+  }
+});
 
 export const useLocationStore = create<LocationState>()(
   persist(
@@ -22,19 +34,34 @@ export const useLocationStore = create<LocationState>()(
       city: null,
       country: null,
       source: 'auto',
-      version: 1,
-      setLocation: (location, source) =>
+      // QIB-012: validate coordinates before storing to prevent NaN/Infinity
+      // from silently propagating into Qibla + prayer calculations.
+      setLocation: (location, source) => {
+        const { lat, lng } = location;
+        if (
+          !Number.isFinite(lat) ||
+          !Number.isFinite(lng) ||
+          lat < -90 ||
+          lat > 90 ||
+          lng < -180 ||
+          lng > 180
+        ) {
+          console.warn('Rejected invalid location', location);
+          return;
+        }
         set({
-          lat: location.lat,
-          lng: location.lng,
+          lat,
+          lng,
           city: location.city ?? null,
           country: location.country ?? null,
           source,
-        }),
+        });
+      },
     }),
     {
       name: 'miqaat-location-storage',
-      version: 1, // Zustand persist version
+      version: 1,
+      storage: safeStorage,
     }
   )
 );

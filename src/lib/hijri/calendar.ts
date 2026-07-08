@@ -60,6 +60,12 @@ export function getHijriMonthGrid(hijriYear: number, monthName: string): Calenda
     current.setDate(current.getDate() + 1);
   }
 
+  // P-H-017: if monthName didn't match (e.g. Intl transliteration drift),
+  // monthDays is empty and monthDays[0] would crash. Return empty grid.
+  if (monthDays.length === 0) {
+    return [];
+  }
+
   // Pad the grid to start on Sunday (0) and end on Saturday (6)
   const firstDayOfWeek = monthDays[0].date.getDay();
   const paddedGrid: CalendarDay[] = [];
@@ -95,6 +101,19 @@ export function getHijriMonthGrid(hijriYear: number, monthName: string): Calenda
     }
   }
 
+  // P-H-022: always pad to 42 cells (6 weeks) so the calendar card
+  // doesn't visibly grow/shrink between 5-week and 6-week months.
+  while (paddedGrid.length < 42) {
+    const last = paddedGrid[paddedGrid.length - 1].date;
+    const next = new Date(last);
+    next.setDate(next.getDate() + 1);
+    paddedGrid.push({
+      date: next,
+      hijri: toHijri(next),
+      isPadding: true
+    });
+  }
+
   // Chunk into weeks
   const weeks: CalendarDay[][] = [];
   for (let i = 0; i < paddedGrid.length; i += 7) {
@@ -106,12 +125,15 @@ export function getHijriMonthGrid(hijriYear: number, monthName: string): Calenda
 
 export function getNextMonth(hijriYear: number, monthName: string) {
   const index = HIJRI_MONTHS.indexOf(monthName);
+  // P-H-034: throw on unknown month instead of silently returning Muharram
+  if (index === -1) throw new Error(`Unknown hijri month: ${monthName}`);
   if (index === 11) return { year: hijriYear + 1, month: HIJRI_MONTHS[0] };
   return { year: hijriYear, month: HIJRI_MONTHS[index + 1] };
 }
 
 export function getPrevMonth(hijriYear: number, monthName: string) {
   const index = HIJRI_MONTHS.indexOf(monthName);
+  if (index === -1) throw new Error(`Unknown hijri month: ${monthName}`);
   if (index === 0) return { year: hijriYear - 1, month: HIJRI_MONTHS[11] };
   return { year: hijriYear, month: HIJRI_MONTHS[index - 1] };
 }

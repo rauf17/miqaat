@@ -31,7 +31,7 @@ export default function AppleIcon() {
           strokeWidth="1.5"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <line x1="2" y1="20" x2="22" y2="20" fill="none" />
+          <line x1="2" y1="20" x2="22" y2="20" />
           <circle cx="12" cy="17" r="3.5" fill="#C9A227" stroke="none" />
           <g fill="#FAFAF8" stroke="none" opacity="0.8">
             <circle cx="7" cy="8" r="0.5" />
