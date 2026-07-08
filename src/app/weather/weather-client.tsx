@@ -20,7 +20,6 @@ export function WeatherClient() {
 
   // WTH-025: memoize moon phase (only changes once per day)
   const moon = React.useMemo(() => getMoonPhase(new Date()), []);
-
   return (
     <motion.main 
       initial={{ opacity: 0, y: 10 }}
