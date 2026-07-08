@@ -13,9 +13,21 @@ import { getWeatherIcon, getWeatherDescription } from '@/lib/weather/utils';
 import { getMoonPhase } from '@/lib/weather/moon-phase';
 import { MoonPhaseIcon } from '@/components/weather/moon-phase-icon';
 
+// WTH-007: human-readable "X min ago" for the last-updated indicator.
+function timeAgo(timestamp: number): string {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hr ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days > 1 ? 's' : ''} ago`;
+}
+
 export function WeatherClient() {
   const { lat, lng } = useLocationStore();
-  const { data, loading, error } = useWeatherStore();
+  const { data, loading, error, lastUpdated } = useWeatherStore();
   const hasLocation = lat !== null && lng !== null;
 
   // WTH-025: memoize moon phase (only changes once per day)
@@ -53,14 +65,31 @@ export function WeatherClient() {
             </div>
           ) : loading && !data ? (
             <div className="w-full h-64 rounded-3xl bg-card/20 border border-border/30 animate-pulse backdrop-blur-md" />
-          ) : error || !data ? (
+          ) : !data ? (
+            // WTH-008: only show the hard error screen when we have NO
+            // data at all. If we have prior data + a transient error,
+            // fall through to render the data with a stale banner.
             <div className="bg-card/20 p-8 rounded-3xl border border-border/30 backdrop-blur-md flex flex-col items-center justify-center py-20">
-              <CloudOff className="w-12 h-12 text-muted-foreground/50 mb-4" />
+              <CloudOff className="w-12 h-12 text-muted-foreground/50 mb-4" aria-hidden="true" />
               <p className="text-muted-foreground font-sans">Weather data is currently unavailable.</p>
             </div>
           ) : (
             <div className="space-y-6">
-              
+              {/* WTH-007/008: stale-data banner. Shown when the last refresh
+                  failed (error=true) but we still have prior data, OR when
+                  the data is older than 30 min. */}
+              {error && (
+                <div role="alert" className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 text-sm flex items-center gap-2">
+                  <CloudOff className="w-4 h-4 shrink-0" aria-hidden="true" />
+                  <span>Couldn&apos;t refresh weather — showing data from {lastUpdated ? timeAgo(lastUpdated) : 'earlier'}. Will retry automatically.</span>
+                </div>
+              )}
+              {!error && lastUpdated && (
+                <div className="text-xs text-muted-foreground/60 text-right" aria-live="polite">
+                  Updated {timeAgo(lastUpdated)}
+                </div>
+              )}
+
               {/* Current Conditions Card */}
               <div className="bg-card/30 rounded-3xl border border-border/50 p-6 md:p-8 backdrop-blur-md shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-6">
