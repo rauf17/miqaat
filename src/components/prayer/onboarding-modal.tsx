@@ -35,36 +35,32 @@ export function OnboardingModal() {
     setCalculationMethod,
     notificationsEnabled,
     setNotificationsEnabled,
+    onboardingCompleted,
+    setOnboardingCompleted,
   } = useSettingsStore();
 
   React.useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    try {
-      const completed = localStorage.getItem('onboardingCompleted');
-      if (!completed) {
-        setIsOpen(true);
-      }
-    } catch {
-      // localStorage may throw in private browsing; treat as not-completed.
+    // SET-005: onboarding flag now lives in the settings store (was
+    // raw localStorage). The store's persist middleware handles Safari
+    // private mode safely via createJSONStorage with try/catch.
+    if (!onboardingCompleted) {
       setIsOpen(true);
     }
-  }, []);
+  }, [onboardingCompleted]);
 
   // Declare handleComplete BEFORE the focus-trap effect so the effect's
   // dependency array is valid (audit A11Y-001).
   const handleComplete = React.useCallback(() => {
-    try {
-      localStorage.setItem('onboardingCompleted', 'true');
-    } catch {
-      // Swallow quota errors in private browsing.
-    }
+    // SET-005: persist via the store setter, not raw localStorage.
+    setOnboardingCompleted(true);
     setIsOpen(false);
     // Restore focus to the previously-focused element (A11Y-001).
     window.setTimeout(() => {
       previouslyFocused.current?.focus();
     }, 0);
-  }, []);
+  }, [setOnboardingCompleted]);
 
   // Focus trap + Escape handler (A11Y-001).
   React.useEffect(() => {

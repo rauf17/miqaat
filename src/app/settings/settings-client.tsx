@@ -12,7 +12,7 @@ import { HeaderDropdown } from '@/components/layout/header-dropdown';
 import { cn } from '@/lib/utils';
 
 export function SettingsClient() {
-  const { calculationMethod, setCalculationMethod, timeFormat, setTimeFormat, madhab, setMadhab, language, setLanguage, reduceMotion, setReduceMotion, largerText, setLargerText } = useSettingsStore();
+  const { calculationMethod, setCalculationMethod, timeFormat, setTimeFormat, madhab, setMadhab, language, setLanguage, reduceMotion, setReduceMotion, largerText, setLargerText, setOnboardingCompleted } = useSettingsStore();
 
   return (
     <motion.main 
@@ -247,6 +247,50 @@ export function SettingsClient() {
                   </button>
                 </div>
 
+              </div>
+            </section>
+
+            {/* Advanced — SET-016/020: recovery + data controls */}
+            <section>
+              <h3 className="text-xs font-bold tracking-widest text-primary uppercase mb-3">Advanced</h3>
+              <div className="rounded-3xl border border-border/50 bg-card/50 backdrop-blur-md p-5 shadow-sm space-y-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-medium">Restart onboarding</h4>
+                    <p className="text-sm text-muted-foreground">Re-run the initial setup wizard.</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setOnboardingCompleted(false);
+                      // Navigate home so the onboarding modal appears.
+                      window.location.href = '/';
+                    }}
+                    className="px-4 py-2 rounded-xl border border-border/50 bg-card/40 text-sm font-medium hover:border-primary/50 hover:bg-card/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    Restart
+                  </button>
+                </div>
+                <div className="h-px w-full bg-border/30" />
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-medium">Clear all data</h4>
+                    <p className="text-sm text-muted-foreground">Wipe location, settings, and caches. Reloads the page.</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (!confirm('Clear all Miqaat data? This cannot be undone.')) return;
+                      try {
+                        localStorage.clear();
+                      } catch {
+                        // ignore
+                      }
+                      window.location.href = '/';
+                    }}
+                    className="px-4 py-2 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive text-sm font-medium hover:bg-destructive/20 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
             </section>
           </div>
