@@ -46,9 +46,14 @@ export function getDailyContent(dateStr: string): DailyContent {
 
   // Cycle through available items
   const verseIndex = daysSinceEpoch % versesData.length;
-  // Use a slight multiplier for hadiths to ensure pairings mix over time 
-  // (if lengths are same, 1-to-1 pairing gets boring)
-  const hadithIndex = (daysSinceEpoch * 7) % hadithsData.length;
+  // P-H-037: extracted magic number 7 into a named constant. The
+  // multiplier ensures verse/hadith pairings mix over time (if both
+  // arrays had the same length, 1-to-1 pairing would be repetitive).
+  // 7 is chosen because gcd(7, 36) = 1, so the hadith index visits
+  // all 36 entries before repeating. If hadithsData.length ever
+  // becomes a multiple of 7, switch to a different prime.
+  const HADITH_DAY_MULTIPLIER = 7;
+  const hadithIndex = (daysSinceEpoch * HADITH_DAY_MULTIPLIER) % hadithsData.length;
 
   return {
     verse: versesData[verseIndex] as Verse,

@@ -2,14 +2,18 @@
 
 import * as React from 'react';
 import { motion } from 'framer-motion';
-import { useSettingsStore } from '@/lib/store/settingsStore';
-import { useCurrentPrayer } from '@/lib/prayer/useCurrentPrayer';
+import { useReduceMotion } from '@/lib/theme/use-reduce-motion';
+import { useTimeOfDay } from '@/lib/theme/useTimeOfDay';
 import { cn } from '@/lib/utils';
 
 export function StreetLamp({ className }: { className?: string }) {
-  const { reduceMotion } = useSettingsStore();
-  const currentPrayerState = useCurrentPrayer();
-  const isNight = currentPrayerState?.isAfterIsha || currentPrayerState?.current.name === 'isha' || currentPrayerState?.current.name === 'maghrib' || currentPrayerState?.current.name === 'fajr';
+  const reduceMotion = useReduceMotion();
+  // THM-026: derive isNight from the theme state (post-sunset) rather
+  // than from prayer state. Previously the lamp glow desynced from the
+  // sky theme because prayer-based night (post-Isha) doesn't match
+  // theme-based night (post-sunset).
+  const { timeOfDay } = useTimeOfDay();
+  const isNight = timeOfDay === 'night';
   
   // Theme the glow based on time of day (warmer at night, more neutral/subtle in day)
   const glowColor = isNight ? 'rgba(251, 191, 36, 0.4)' : 'rgba(250, 204, 21, 0.2)';

@@ -110,7 +110,7 @@ export function DailyContentPanel() {
         {/* Primary Scripture Content */}
         <div className="flex flex-col gap-4">
           {content.showVerse && (
-            <p className="text-right text-2xl md:text-3xl leading-relaxed text-foreground font-arabic" dir="rtl">
+            <p className="text-right text-2xl md:text-3xl leading-relaxed text-foreground font-arabic" dir="rtl" lang="ar">
               {content.verse.arabic}
             </p>
           )}

@@ -35,9 +35,16 @@ export default function Image() {
           xmlns="http://www.w3.org/2000/svg"
           style={{ marginBottom: '40px' }}
         >
-          <line x1="2" y1="20" x2="22" y2="20" fill="none" />
+          {/* MKT-026: removed dead fill="none" on <line> (stroked shape) */}
+          <line x1="2" y1="20" x2="22" y2="20" />
           <circle cx="12" cy="17" r="3.5" fill="#C9A227" stroke="none" />
           <path d="M2 8 C 6 5, 10 7, 12 7 C 14 7, 18 5, 22 8" fill="none" strokeLinecap="round" />
+          {/* MKT-020: added star decoration to match icon + apple-icon */}
+          <g fill="#FAFAF8" stroke="none" opacity="0.8">
+            <circle cx="7" cy="8" r="0.5" />
+            <circle cx="17" cy="6" r="0.75" />
+            <circle cx="15" cy="11" r="0.5" />
+          </g>
         </svg>
         <h1 style={{ fontSize: '80px', fontWeight: 'bold', margin: 0, letterSpacing: '-0.02em' }}>
           Miqaat

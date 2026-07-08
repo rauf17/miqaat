@@ -84,31 +84,36 @@ export function useCurrentPrayer() {
 
   useEffect(() => {
     if (lat === null || lng === null) return;
+    // P-H-030: capture into local consts so TypeScript narrows inside
+    // the update() closure (the outer null check doesn't propagate
+    // into nested function scopes without this).
+    const locationLat = lat;
+    const locationLng = lng;
 
     function update() {
       const now = new Date();
       // Ensure we use the start of the current day to avoid shifting during the day
       const todayDate = startOfDay(now);
-      
+
       const yesterday = calculatePrayerTimes({
-        lat: lat!,
-        lng: lng!,
+        lat: locationLat,
+        lng: locationLng,
         date: addDays(todayDate, -1),
         method: calculationMethod,
         madhab,
       });
 
       const today = calculatePrayerTimes({
-        lat: lat!,
-        lng: lng!,
+        lat: locationLat,
+        lng: locationLng,
         date: todayDate,
         method: calculationMethod,
         madhab,
       });
 
       const tomorrow = calculatePrayerTimes({
-        lat: lat!,
-        lng: lng!,
+        lat: locationLat,
+        lng: locationLng,
         date: addDays(todayDate, 1),
         method: calculationMethod,
         madhab,

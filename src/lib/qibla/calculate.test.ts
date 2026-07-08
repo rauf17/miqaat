@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getQiblaBearing } from './calculate';
+import { getQiblaBearing, validateCoordinates } from './calculate';
 
 describe('getQiblaBearing', () => {
   it('calculates the correct bearing for London, UK', () => {
@@ -27,5 +27,61 @@ describe('getQiblaBearing', () => {
     // Slightly south of Kaaba
     const bearing = getQiblaBearing(21.4, 39.8262);
     expect(bearing).toBeCloseTo(0, 0); // pointing due North
+  });
+
+  // QIB-011: added Southern hemisphere, antipode-adjacent, and
+  // high-latitude cases that were previously untested.
+  it('calculates a finite bearing for Sydney, Australia (Southern hemisphere)', () => {
+    const bearing = getQiblaBearing(-33.8688, 151.2093);
+    expect(Number.isFinite(bearing)).toBe(true);
+    expect(bearing).toBeGreaterThanOrEqual(0);
+    expect(bearing).toBeLessThan(360);
+    // Sydney Qibla is roughly 277° (west-northwest)
+    expect(bearing).toBeCloseTo(277.5, 0);
+  });
+
+  it('calculates a finite bearing for Antarctica (-80, 0)', () => {
+    const bearing = getQiblaBearing(-80, 0);
+    expect(Number.isFinite(bearing)).toBe(true);
+    expect(bearing).toBeGreaterThanOrEqual(0);
+    expect(bearing).toBeLessThan(360);
+  });
+
+  it('calculates a finite bearing near the International Date Line (Fiji)', () => {
+    const bearing = getQiblaBearing(-18.1, 178.4);
+    expect(Number.isFinite(bearing)).toBe(true);
+    expect(bearing).toBeGreaterThanOrEqual(0);
+    expect(bearing).toBeLessThan(360);
+  });
+});
+
+// QIB-010: validateCoordinates tests
+describe('validateCoordinates', () => {
+  it('accepts valid coordinates', () => {
+    expect(() => validateCoordinates(0, 0)).not.toThrow();
+    expect(() => validateCoordinates(90, 180)).not.toThrow();
+    expect(() => validateCoordinates(-90, -180)).not.toThrow();
+    expect(() => validateCoordinates(21.4225, 39.8262)).not.toThrow();
+  });
+
+  it('throws RangeError on NaN', () => {
+    expect(() => validateCoordinates(NaN, 0)).toThrow(RangeError);
+    expect(() => validateCoordinates(0, NaN)).toThrow(RangeError);
+    expect(() => validateCoordinates(NaN, NaN)).toThrow(RangeError);
+  });
+
+  it('throws RangeError on Infinity', () => {
+    expect(() => validateCoordinates(Infinity, 0)).toThrow(RangeError);
+    expect(() => validateCoordinates(0, -Infinity)).toThrow(RangeError);
+  });
+
+  it('throws RangeError on out-of-range latitude', () => {
+    expect(() => validateCoordinates(91, 0)).toThrow(RangeError);
+    expect(() => validateCoordinates(-91, 0)).toThrow(RangeError);
+  });
+
+  it('throws RangeError on out-of-range longitude', () => {
+    expect(() => validateCoordinates(0, 181)).toThrow(RangeError);
+    expect(() => validateCoordinates(0, -181)).toThrow(RangeError);
   });
 });

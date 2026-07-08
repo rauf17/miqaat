@@ -8,6 +8,8 @@ import { MoreVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { StreetLamp } from '@/components/ui/street-lamp';
+import { NAV_LINKS } from '@/components/layout/nav-links';
+
 export function HeaderDropdown() {
   const [isOpen, setIsOpen] = React.useState(false);
   const pathname = usePathname();
@@ -33,12 +35,9 @@ export function HeaderDropdown() {
     };
   }, [isOpen]);
 
-  const links = [
-    { href: '/', label: 'Dashboard' },
-    { href: '/welcome', label: 'Welcome' },
-    { href: '/settings', label: 'Settings' },
-    { href: '/contact', label: 'Contact' },
-  ];
+  // Pulled from the shared `NAV_LINKS` so this surface and `FloatingNav`
+  // can never drift out of sync. See `./nav-links.ts` for rationale.
+  const links = NAV_LINKS;
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -65,7 +64,13 @@ export function HeaderDropdown() {
           >
             <div className="flex flex-col py-2">
               {links.map((link) => {
-                const isActive = pathname === link.href;
+                // Match FloatingNav's active-state logic (exact for "/",
+                // startsWith for everything else) so the two surfaces
+                // agree on what's "current".
+                const isActive =
+                  link.href === '/'
+                    ? pathname === '/'
+                    : pathname === link.href || pathname.startsWith(link.href + '/');
                 return (
                   <Link
                     key={link.href}

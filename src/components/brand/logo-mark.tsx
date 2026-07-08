@@ -44,23 +44,29 @@ export function LogoMark({ animateIn = false, isHovered = false, reducedMotion =
     }
   };
 
+  // THM-006: do NOT animate opacity here — the CSS variable
+  // --logo-star-opacity controls it (0 for day/dawn/golden, 1 for night).
+  // Previously the variant wrote opacity:1 as inline style, overriding
+  // the CSS variable and making stars always visible. Now we animate
+  // scale for the entrance effect, and let the CSS variable own opacity.
   const starsVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
+    hidden: { scale: 0 },
+    visible: {
+      scale: 1,
       transition: { delay: 0.7, duration: 0.4 }
     }
   };
 
   return (
-    <motion.svg 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="1.5" 
+    <motion.svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
       className={cn("text-[var(--logo-base)]", className)}
       initial={animateIn && !reducedMotion ? "hidden" : "visible"}
       animate={isHovered ? "hover" : "visible"}
+      aria-hidden="true"
       {...props}
     >
       {/* Horizon */}

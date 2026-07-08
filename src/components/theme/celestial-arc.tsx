@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useRef } from 'react';
 import { useTimeOfDay } from '@/lib/theme/useTimeOfDay';
-import { useSettingsStore } from '@/lib/store/settingsStore';
+import { useReduceMotion } from '@/lib/theme/use-reduce-motion';
 import { cn } from '@/lib/utils';
 import { motion, useMotionValue, useTransform, useAnimationFrame, PanInfo } from 'framer-motion';
 
@@ -55,7 +55,7 @@ function useCelestialProgress() {
 export function CelestialArc() {
   const { timeOfDay } = useTimeOfDay();
   const progress = useCelestialProgress();
-  const { reduceMotion } = useSettingsStore();
+  const reduceMotion = useReduceMotion();
 
   const isNight = timeOfDay === 'night';
   
@@ -91,16 +91,25 @@ export function CelestialArc() {
     isDragging.current = true;
   };
 
+  const lastPanTime = useRef<number | null>(null);
   const handlePan = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     // Directly update the rotation by the pan delta
     rotation.set(rotation.get() + info.delta.x);
-    // Update velocity based on the pan delta so it carries momentum when released
-    // (Assuming ~16ms per frame for 60fps)
-    velocity.set(info.delta.x / 16);
+    // THM-016: compute real instantaneous velocity using actual time
+    // delta instead of assuming 16ms (60fps). On 120Hz displays the
+    // old formula gave 2x too-high velocity; on throttled background
+    // tabs it gave 6x too-low.
+    const now = performance.now();
+    if (lastPanTime.current !== null) {
+      const dt = Math.max(8, now - lastPanTime.current);
+      velocity.set(info.delta.x / dt);
+    }
+    lastPanTime.current = now;
   };
 
   const handlePanEnd = () => {
     isDragging.current = false;
+    lastPanTime.current = null;
   };
 
   return (
@@ -109,8 +118,9 @@ export function CelestialArc() {
       {/* Required keyframes for the spinning effect */}
       <style>{`
         @keyframes pulseSun {
-          0% { transform: scale(1) translate(-50%, -50%); opacity: 0.8; }
-          100% { transform: scale(1.1) translate(-45%, -45%); opacity: 1; }
+          /* THM-012: removed translate() which drifted the corona off-center */
+          0% { transform: scale(1); opacity: 0.8; }
+          100% { transform: scale(1.1); opacity: 1; }
         }
       `}</style>
 
@@ -185,7 +195,7 @@ export function CelestialArc() {
             </div>
           ) : (
             // BRILLIANT 3D SUN
-            <div className="relative w-full h-full flex items-center justify-center mix-blend-screen pointer-events-none">
+            <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
               {/* Intense outer corona */}
               <div 
                 className="absolute inset-[-60%] rounded-full opacity-60"

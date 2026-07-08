@@ -23,12 +23,14 @@ export function MoonPhaseIcon({ phase, className = "w-6 h-6" }: { phase: number,
   else if (p < 0.75) innerSweep = 0;
   else innerSweep = 1;
 
-  // Edge cases
-  if (p === 0 || p === 1) {
-    // New moon - just a dark circle
+  // WTH-012: new-moon icon was a thin stroked ring with no fill,
+  // invisible against dark card backgrounds. Now render a dashed
+  // "earthshine" outline so the new-moon phase is visible. Also
+  // widened threshold to catch near-new-moon phases.
+  if (p < 0.03 || p > 0.97) {
     return (
-      <svg viewBox="0 0 100 100" className={className} fill="none" stroke="currentColor" strokeWidth="2">
-        <circle cx="50" cy="50" r="49" />
+      <svg viewBox="0 0 100 100" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="3 5" strokeOpacity="0.6" aria-hidden="true">
+        <circle cx="50" cy="50" r="42" />
       </svg>
     );
   }

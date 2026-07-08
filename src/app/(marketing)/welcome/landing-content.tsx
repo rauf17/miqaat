@@ -13,8 +13,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FaqSection } from '@/components/layout/faq-section';
-import { SiteFooter } from '@/components/layout/site-footer';
 import { HeaderDropdown } from '@/components/layout/header-dropdown';
+import { SITE } from '@/lib/site';
 
 /* ─────────────────────── DATA ─────────────────────── */
 
@@ -23,7 +23,7 @@ const FEATURES = [
     icon: Clock,
     title: 'Living Prayer Timeline',
     description:
-      'Six prayer times calculated from the sun\u2019s true position at your coordinates. A glowing marker follows you through the day \u2014 past prayers dim, the current one pulses, and the next countdown ticks in real time.',
+      'Five daily prayers plus sunrise, calculated from the sun\u2019s true position at your coordinates. A glowing marker follows you through the day \u2014 past prayers dim, the current one pulses, and the next countdown ticks in real time.',
     screenshot: '/marketing/timeline.webp',
   },
   {
@@ -44,7 +44,7 @@ const FEATURES = [
     icon: BookOpen,
     title: 'Daily Reflection',
     description:
-      'Each day surfaces a verified Quranic verse or Sahih Hadith from a curated dataset of 100 entries \u2014 never AI\u2011generated scripture. An optional AI reflection adds a warm, personal thought without inventing or paraphrasing sacred text.',
+      'Each day surfaces a verified Quranic verse or Sahih Hadith from a curated dataset of 86 entries \u2014 never AI\u2011generated scripture. An optional AI reflection adds a warm, personal thought without inventing or paraphrasing sacred text.',
     screenshot: '/marketing/reflection.webp',
   },
 ];
@@ -93,14 +93,26 @@ const stagger = (delay: number) => ({
 
 /* ─────────────── SCREENSHOT IMAGE ─────────────── */
 
-function FeatureImage({ src, alt }: { src: string; alt: string }) {
+function FeatureImage({ src, alt, icon: Icon, title }: { src: string; alt: string; icon: React.ComponentType<{ className?: string }>; title: string }) {
   const [hasError, setHasError] = React.useState(false);
 
-  if (hasError) {
+  // Designed placeholder shown when the screenshot asset is missing (audit
+  // MKT-001: all 4 marketing screenshots currently 404 because
+  // public/marketing/ doesn't exist). Rather than showing a broken-image
+  // fallback, we render a branded gradient card with the feature icon
+  // and title — visually intentional, not a failure state.
+  if (hasError || !src) {
     return (
-      <div className="relative w-full aspect-[9/16] max-h-[520px] rounded-2xl overflow-hidden border border-border/30 shadow-2xl bg-card/10 flex items-center justify-center">
-        <span className="text-muted-foreground/40 text-sm font-medium px-4 text-center">
-          Screenshot Placeholder
+      <div className="relative w-full aspect-[9/16] max-h-[520px] rounded-2xl overflow-hidden border border-border/30 shadow-2xl bg-gradient-to-br from-primary/10 via-card/40 to-background flex flex-col items-center justify-center gap-6 p-8">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-primary/8 blur-[80px] pointer-events-none" />
+        <div className="relative z-10 w-20 h-20 rounded-2xl bg-primary/15 flex items-center justify-center">
+          <Icon className="w-10 h-10 text-primary" />
+        </div>
+        <span className="relative z-10 text-foreground/70 text-lg font-heading font-semibold text-center px-4">
+          {title}
+        </span>
+        <span className="relative z-10 text-muted-foreground/50 text-xs uppercase tracking-widest">
+          Miqaat
         </span>
       </div>
     );
@@ -126,7 +138,7 @@ function FeatureImage({ src, alt }: { src: string; alt: string }) {
 
 export function LandingContent() {
   return (
-    <div className="flex flex-col w-full overflow-hidden bg-background">
+    <main className="flex flex-col w-full overflow-hidden bg-background">
       {/* ───────── HEADER ───────── */}
       <header className="fixed top-0 left-0 right-0 z-50 p-4 md:p-6 flex items-center justify-between bg-background/80 backdrop-blur-md border-b border-border/10">
         <div className="flex items-center gap-2">
@@ -197,7 +209,7 @@ export function LandingContent() {
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           <a
-            href="https://github.com/rauf17/miqaat"
+            href={SITE.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border border-border/50 text-muted-foreground hover:text-foreground hover:border-border transition-all duration-300 font-medium"
@@ -246,7 +258,7 @@ export function LandingContent() {
               return (
                 <motion.div
                   key={feature.title}
-                  {...stagger(0)}
+                  {...fadeUp}
                   className={cn(
                     'flex flex-col items-center gap-10 md:gap-16',
                     isEven ? 'md:flex-row' : 'md:flex-row-reverse'
@@ -260,6 +272,8 @@ export function LandingContent() {
                     <FeatureImage
                       src={feature.screenshot}
                       alt={`${feature.title} screenshot`}
+                      icon={Icon}
+                      title={feature.title}
                     />
                   </motion.div>
 
@@ -399,7 +413,7 @@ export function LandingContent() {
       </section>
 
       {/* ───────── FOOTER ───────── */}
-      <SiteFooter />
-    </div>
+      {/* SiteFooter is mounted in the root layout — no need to render it here. */}
+    </main>
   );
 }

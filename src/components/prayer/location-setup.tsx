@@ -2,12 +2,11 @@
 
 import * as React from 'react';
 import { useLocationStore } from '@/lib/store/locationStore';
-import { useSettingsStore } from '@/lib/store/settingsStore';
-import { MapPin, Search, Loader2 } from 'lucide-react';
+import { MapPin, Search, Loader2, AlertCircle } from 'lucide-react';
 
 export function LocationSetup() {
   const { setLocation } = useLocationStore();
-  const { setManualLocationOverride } = useSettingsStore();
+  // SET-015: removed dead setManualLocationOverride (was never read)
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   
@@ -17,7 +16,6 @@ export function LocationSetup() {
   const requestLocation = () => {
     setLoading(true);
     setError(null);
-    setManualLocationOverride(false);
 
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser');
@@ -58,8 +56,14 @@ export function LocationSetup() {
           setLoading(false);
         }
       },
-      () => {
-        setError('Location access denied or timed out. Please enter manually.');
+      (err: GeolocationPositionError) => {
+        // SET-019 / QIB-009: differentiate error codes for actionable messaging
+        const messages: Record<number, string> = {
+          1: 'Location permission denied. You can search for your city manually below.',
+          2: 'Location is unavailable right now (check GPS). Please try again or search manually.',
+          3: 'Location request timed out. Please try again or search manually.',
+        };
+        setError(messages[err.code] ?? 'Could not get your location. Please search manually.');
         setLoading(false);
       },
       { timeout: 10000, maximumAge: 60000 }
@@ -72,7 +76,6 @@ export function LocationSetup() {
     
     setLoading(true);
     setError(null);
-    setManualLocationOverride(false); // Reset while loading
 
     try {
       const res = await fetch(`/api/geocode?city=${encodeURIComponent(searchQuery)}`);
@@ -89,7 +92,6 @@ export function LocationSetup() {
         },
         'manual'
       );
-      setManualLocationOverride(true);
       setSearchQuery('');
     } catch {
       setError('Could not find that city. Please try another name.');
@@ -134,9 +136,16 @@ export function LocationSetup() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                // SET-040: clear stale error when user types a new query
+                if (error) setError(null);
+              }}
               placeholder="Search city manually..."
               aria-label="Search city manually"
+              autoComplete="off"
+              name="city-search"
+              spellCheck={false}
               disabled={loading}
               className="w-full bg-input/50 border border-border rounded-xl py-3 pl-10 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
             />
@@ -152,8 +161,9 @@ export function LocationSetup() {
         </form>
 
         {error && (
-          <div className="p-3 mt-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium flex items-start gap-2">
-            <span className="shrink-0">⚠️</span>
+          // A11Y-012: role="alert" announces the error to screen readers
+          <div role="alert" className="p-3 mt-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
             <p>{error}</p>
           </div>
         )}

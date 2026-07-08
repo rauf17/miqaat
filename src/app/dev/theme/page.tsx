@@ -1,9 +1,13 @@
 import * as React from 'react';
+import { notFound } from 'next/navigation';
 import { GeometricPattern } from '@/components/ui/geometric-pattern';
 import { NightAtmosphere } from '@/components/ui/night-atmosphere';
 import { TimeOfDay } from '@/lib/theme/useTimeOfDay';
 
-// NOTE: This route is for development QA only and must be removed before production.
+// This route is for development QA only. In production builds it returns
+// 404 via the `notFound()` call below, which renders src/app/not-found.tsx.
+// During `npm run dev` the page renders normally so designers/developers
+// can preview the four time-adaptive theme states side-by-side.
 
 const states: { id: TimeOfDay; name: string; desc: string }[] = [
   { id: 'dawn', name: 'Dawn', desc: 'Fajr & Shuruq - Soft, cool, peaceful' },
@@ -13,6 +17,13 @@ const states: { id: TimeOfDay; name: string; desc: string }[] = [
 ];
 
 export default function ThemeQAPage() {
+  // Production gate — `process.env.NODE_ENV` is replaced at build time,
+  // so this branch is statically resolved during `next build`. The page
+  // prerenders as a 404 and is unreachable at runtime in production.
+  if (process.env.NODE_ENV === 'production') {
+    notFound();
+  }
+
   return (
     <div className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto space-y-8">

@@ -30,7 +30,6 @@ import { OnboardingModal } from '@/components/prayer/onboarding-modal';
 import { AmbientBackground } from '@/components/theme/ambient-background';
 import { HeaderDropdown } from '@/components/layout/header-dropdown';
 import { FaqSection } from '@/components/layout/faq-section';
-import { SiteFooter } from '@/components/layout/site-footer';
 
 const PRAYER_DISPLAY_NAMES: Record<PrayerName, string> = {
   fajr: 'Fajr',
@@ -57,10 +56,10 @@ function WeatherInline() {
   }
 
   const { tempC, conditionCode } = data.current;
-  const Icon = getWeatherIcon(conditionCode);
+  const Icon = getWeatherIcon(conditionCode, data.current.isDay === 1);
 
   return (
-    <Link href="/weather" className="flex items-center gap-1.5 hover:text-foreground transition-colors group">
+    <Link href="/weather" aria-label={`Weather: ${tempC}°, view forecast`} className="flex items-center gap-1.5 hover:text-foreground transition-colors group">
       {React.createElement(Icon, { className: "w-4 h-4 text-foreground/70 group-hover:text-foreground transition-colors" })}
       <span>{tempC}°</span>
     </Link>
@@ -80,12 +79,17 @@ export default function Home() {
     const tick = () => setDate(new Date());
     tick();
     const intervalId = setInterval(tick, 60000);
-    
-    const timer = setTimeout(() => setIsMounted(true), 800);
-    
+
+    // PSP-001: Previously forced an 800ms artificial delay before
+    // dismissing the splash and revealing content. This delayed LCP by
+    // ~1.2s on every navigation to "/". Now we mount immediately — the
+    // splash screen's own fade-out (400ms) provides the visual transition
+    // without blocking interaction.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+
     return () => {
       clearInterval(intervalId);
-      clearTimeout(timer);
     };
   }, []);
 
@@ -236,7 +240,6 @@ export default function Home() {
       </div>
       <div className="w-full pointer-events-auto">
         <FaqSection id="faq" />
-        <SiteFooter />
       </div>
     </main>
     </>
