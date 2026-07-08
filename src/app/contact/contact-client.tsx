@@ -34,17 +34,18 @@ export function ContactClient() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
             {/* Email */}
             <a
-              href="mailto:connect2rauf17@gmail.com"
+              href={`mailto:${SITE.contactEmail}?subject=${encodeURIComponent('Miqaat — Feedback')}&body=${encodeURIComponent('Hi,\n\n[Your message]\n\n— ')}`}
               className="group relative flex flex-col p-8 rounded-3xl border border-border/50 bg-card/40 backdrop-blur-md hover:border-primary/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 text-primary">
-                <Mail className="w-6 h-6" />
+                <Mail className="w-6 h-6" aria-hidden="true" />
               </div>
-              <h3 className="text-xl font-heading font-bold mb-2">Email</h3>
+              {/* MKT-010: h3 -> h2 so heading hierarchy doesn't skip from h1 to h3 */}
+              <h2 className="text-xl font-heading font-bold mb-2">Email</h2>
               <p className="text-muted-foreground mb-4">Send us a direct message for support or general inquiries.</p>
               <span className="mt-auto text-primary font-medium flex items-center gap-1 group-hover:underline">
-                connect2rauf17@gmail.com
+                {SITE.contactEmail}
               </span>
             </a>
 
@@ -57,9 +58,10 @@ export function ContactClient() {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 text-primary">
-                <Code2 className="w-6 h-6" />
+                <Code2 className="w-6 h-6" aria-hidden="true" />
               </div>
-              <h3 className="text-xl font-heading font-bold mb-2">GitHub</h3>
+              {/* MKT-010: h3 -> h2 for consistent heading hierarchy */}
+              <h2 className="text-xl font-heading font-bold mb-2">GitHub</h2>
               <p className="text-muted-foreground mb-4">Report issues, suggest features, or contribute code.</p>
               <span className="mt-auto text-primary font-medium flex items-center gap-1 group-hover:underline">
                 Open Repository

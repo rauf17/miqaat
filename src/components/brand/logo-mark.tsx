@@ -58,14 +58,15 @@ export function LogoMark({ animateIn = false, isHovered = false, reducedMotion =
   };
 
   return (
-    <motion.svg 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="1.5" 
+    <motion.svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
       className={cn("text-[var(--logo-base)]", className)}
       initial={animateIn && !reducedMotion ? "hidden" : "visible"}
       animate={isHovered ? "hover" : "visible"}
+      aria-hidden="true"
       {...props}
     >
       {/* Horizon */}

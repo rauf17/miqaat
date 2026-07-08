@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 import { useTimeOfDay } from '@/lib/theme/useTimeOfDay';
-import { useSettingsStore } from '@/lib/store/settingsStore';
+import { useReduceMotion } from '@/lib/theme/use-reduce-motion';
 import { NAV_LINKS } from '@/components/layout/nav-links';
 
 /**
@@ -34,7 +34,7 @@ import { NAV_LINKS } from '@/components/layout/nav-links';
 export function FloatingNav() {
   const pathname = usePathname();
   const { timeOfDay } = useTimeOfDay();
-  const reduceMotion = useSettingsStore((s) => s.reduceMotion);
+  const reduceMotion = useReduceMotion();
 
   const themeColors = {
     dawn: {

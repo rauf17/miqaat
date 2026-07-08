@@ -59,7 +59,7 @@ function WeatherInline() {
   const Icon = getWeatherIcon(conditionCode, data.current.isDay === 1);
 
   return (
-    <Link href="/weather" className="flex items-center gap-1.5 hover:text-foreground transition-colors group">
+    <Link href="/weather" aria-label={`Weather: ${tempC}°, view forecast`} className="flex items-center gap-1.5 hover:text-foreground transition-colors group">
       {React.createElement(Icon, { className: "w-4 h-4 text-foreground/70 group-hover:text-foreground transition-colors" })}
       <span>{tempC}°</span>
     </Link>

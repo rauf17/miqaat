@@ -109,8 +109,9 @@ export function CelestialArc() {
       {/* Required keyframes for the spinning effect */}
       <style>{`
         @keyframes pulseSun {
-          0% { transform: scale(1) translate(-50%, -50%); opacity: 0.8; }
-          100% { transform: scale(1.1) translate(-45%, -45%); opacity: 1; }
+          /* THM-012: removed translate() which drifted the corona off-center */
+          0% { transform: scale(1); opacity: 0.8; }
+          100% { transform: scale(1.1); opacity: 1; }
         }
       `}</style>
 

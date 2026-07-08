@@ -18,6 +18,8 @@ export function WeatherClient() {
   const { data, loading, error } = useWeatherStore();
   const hasLocation = lat !== null && lng !== null;
 
+  // WTH-025: memoize moon phase (only changes once per day)
+  const moon = React.useMemo(() => getMoonPhase(new Date()), []);
   return (
     <motion.main 
       initial={{ opacity: 0, y: 10 }}
@@ -97,7 +99,7 @@ export function WeatherClient() {
               {/* 24-Hour Forecast Row */}
               <div className="bg-card/20 rounded-3xl border border-border/30 p-6 backdrop-blur-md overflow-hidden">
                 <h3 className="font-heading text-lg font-semibold mb-4">24-Hour Forecast</h3>
-                <div className="flex overflow-x-auto gap-4 pb-4 snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div className="flex overflow-x-auto gap-4 pb-4 snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:thin]" role="region" aria-label="24-hour forecast, scroll horizontally" tabIndex={0}>
                   {/* WTH-004: Open-Meteo's hourly array starts at 00:00 of
                       the current day. Previously idx===0 (midnight) was
                       labeled "Now" even at 3pm. Now we find the first
@@ -200,22 +202,17 @@ export function WeatherClient() {
                     </div>
                   )}
                   
-                  {/* Moon Phase */}
-                  {(() => {
-                    const moon = getMoonPhase(new Date());
-                    return (
-                      <div className="flex items-center gap-4 bg-card/30 p-4 rounded-2xl border border-border/20">
-                        <MoonPhaseIcon phase={moon.phase} className="w-8 h-8 text-primary/80" />
-                        <div>
-                          <div className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">Moon Phase</div>
-                          <div className="text-lg font-medium">
-                            {moon.name}
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{moon.illumination}% illuminated</div>
-                        </div>
+                  {/* Moon Phase (WTH-030: extracted IIFE, WTH-025: memoized) */}
+                  <div className="flex items-center gap-4 bg-card/30 p-4 rounded-2xl border border-border/20">
+                    <MoonPhaseIcon phase={moon.phase} className="w-8 h-8 text-primary/80" />
+                    <div>
+                      <div className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">Moon Phase</div>
+                      <div className="text-lg font-medium">
+                        {moon.name}
                       </div>
-                    );
-                  })()}
+                      <div className="text-xs text-muted-foreground mt-0.5">{moon.illumination}% illuminated</div>
+                    </div>
+                  </div>
                 </div>
 
               </div>

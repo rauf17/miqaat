@@ -138,7 +138,7 @@ function FeatureImage({ src, alt, icon: Icon, title }: { src: string; alt: strin
 
 export function LandingContent() {
   return (
-    <div className="flex flex-col w-full overflow-hidden bg-background">
+    <main className="flex flex-col w-full overflow-hidden bg-background">
       {/* ───────── HEADER ───────── */}
       <header className="fixed top-0 left-0 right-0 z-50 p-4 md:p-6 flex items-center justify-between bg-background/80 backdrop-blur-md border-b border-border/10">
         <div className="flex items-center gap-2">
@@ -258,7 +258,7 @@ export function LandingContent() {
               return (
                 <motion.div
                   key={feature.title}
-                  {...stagger(0)}
+                  {...fadeUp}
                   className={cn(
                     'flex flex-col items-center gap-10 md:gap-16',
                     isEven ? 'md:flex-row' : 'md:flex-row-reverse'
@@ -414,6 +414,6 @@ export function LandingContent() {
 
       {/* ───────── FOOTER ───────── */}
       {/* SiteFooter is mounted in the root layout — no need to render it here. */}
-    </div>
+    </main>
   );
 }
