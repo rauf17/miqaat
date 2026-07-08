@@ -26,6 +26,17 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      // PSP-023: cache the service worker itself with no-cache so
+      // updates are picked up immediately.
+      {
+        source: "/sw.js",
+        headers: [
+          {
+            key: "cache-control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+        ],
+      },
     ];
   },
   // PSP-008: optimize package imports for tree-shaking.
