@@ -220,21 +220,35 @@
     scrollbar-gutter: stable;
   }
   
-  /* THM-001: reduced transition duration from 60s to 1.5s. A 60s
-     transition never visually completes during a typical session and
-     causes "stuck theme" perception. 1.5s is a comfortable morph.
-     THM-003: broadened selector from .card + [data-theme-transition]
-     to * (all elements) so that bg-muted, text-primary, border-border,
-     etc. also morph instead of snapping. Safe at 1.5s; would be
-     expensive at 60s. */
-  html.theme-loaded *, .theme-loaded *::before, .theme-loaded *::after {
-    transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity, --time-bg, --time-bg-end, --time-card, --time-text, --time-accent, --time-glow;
-    transition-duration: 1.5s;
+  /* THM-001: reduced transition duration from 60s to 0.6s. A 60s
+     transition never visually completes during a typical session.
+     0.6s is a comfortable morph for the 4 daily theme transitions.
+
+     FIX (blinking regression): the P1 THM-003 fix used `*` (all
+     elements) which caused every button hover, page mount, and state
+     change to slowly transition over 1.5s — perceived as "blinking".
+     Now scoped to 3 targets only:
+       1. html (where --time-* custom properties are set via
+          [data-time-of-day]) — @property-registered custom props
+          interpolate here, and inherits:true propagates the
+          interpolated values to ALL children automatically.
+       2. body (where background-color and color resolve via @apply)
+          — covers the main background gradient + inherited text.
+       3. [data-theme-transition] — explicit opt-in for cards, etc.
+     Interactive elements (buttons, links) keep their own fast Tailwind
+     transition-colors (150ms) — no more sluggish hover/click. */
+  html.theme-loaded,
+  html.theme-loaded body,
+  .theme-loaded [data-theme-transition] {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow, --time-bg, --time-bg-end, --time-card, --time-text, --time-accent, --time-glow;
+    transition-duration: 0.6s;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    html.theme-loaded *, .theme-loaded *::before, .theme-loaded *::after {
+    html.theme-loaded,
+    html.theme-loaded body,
+    .theme-loaded [data-theme-transition] {
       transition-duration: 0.1s;
     }
   }
